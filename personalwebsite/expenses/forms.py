@@ -1,6 +1,6 @@
 from django import forms
 from .models import expenseReport
-import datetime
+from datetime import datetime
 
 class expenseReportForm(forms.ModelForm):
     RENT_MORTAGAGE = 'RENT_MORTGAGE'
@@ -15,8 +15,9 @@ class expenseReportForm(forms.ModelForm):
     SHOPPING = 'SHOPPING'
     HOME_IMPROVEMENT = 'HOME_IMPROVEMENT'
     HEALTHCARE = 'HEALTHCARE'
+    GIVING = 'GIVING'
 
-    EXPENSE_CHOICES = (
+    CHOICE = (
         (RENT_MORTAGAGE,'Rent/Mortgage'),
         (GAS_REPAIRS, 'Gas/Vehicle Repairs'),
         (INCOME, 'Income'),
@@ -28,20 +29,24 @@ class expenseReportForm(forms.ModelForm):
         (TRAVEL, 'Travel'),
         (SHOPPING, 'Shopping'),
         (HOME_IMPROVEMENT, 'Home Improvement and Repairs'),
-        (HEALTHCARE, 'Healthcare')    
+        (HEALTHCARE, 'Healthcare'),    
+        (GIVING, 'Giving')
     )
-    date = forms.DateField(widget=forms.DateTimeInput(attrs={
-        'class':'date-time-input','placeholder':'YYYY-MM-DD'
-        }))
-    expenseChoices = forms.MultipleChoiceField(widget=forms.Select(choices=EXPENSE_CHOICES,attrs={
-        'class':'expense-choices'
-    }))
-    note = forms.CharField(widget=forms.TextInput(attrs={
-        'class':'note-input','placeholder':'Add note'
-        }))
-    value = forms.DecimalField(max_digits=1000,widget=forms.NumberInput(attrs={
-        'class':'value-input'
-    }))
+    date = forms.DateField(widget=forms.DateTimeInput(
+        attrs={'class':'date-time-input','placeholder':'YYYY-MM-DD',}),
+        initial=datetime.today().strftime('%Y-%m-%d'),
+        label="Date")
+    
+    expenseChoices = forms.ChoiceField(widget=forms.Select,
+                                       choices=CHOICE,
+                                       label="Expense Category")
+    value = forms.DecimalField(max_digits=1000,
+                               widget=forms.NumberInput(
+                               attrs={'class':'value-input'}),
+                               label="Amount")
+    note = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'Add note'}),
+                                                  required=False,
+                                                  label="Note")
     
     class Meta:
         model = expenseReport

@@ -17,6 +17,7 @@ class expenseReport(models.Model):
     SHOPPING = 'SHOPPING'
     HOME_IMPROVEMENT = 'HOME_IMPROVEMENT'
     HEALTHCARE = 'HEALTHCARE'
+    GIVING = 'GIVING'
 
     EXPENSE_CHOICES = (
         (RENT_MORTAGAGE,'Rent/Mortgage'),
@@ -30,7 +31,8 @@ class expenseReport(models.Model):
         (TRAVEL, 'Travel'),
         (SHOPPING, 'Shopping'),
         (HOME_IMPROVEMENT, 'Home Improvement and Repairs'),
-        (HEALTHCARE, 'Healthcare')    
+        (HEALTHCARE, 'Healthcare'),    
+        (GIVING,'Giving')
     )
     
     date = models.DateField(default=now)
