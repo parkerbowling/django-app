@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crud</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
+</head>
+<body>
+    
+    <div class="container mt-3">
+      <!-- this code block is used to used to create a url link -->
+      <a href="{% url 'create'%}" >link to create a form</a>
+      <hr>
+      <!-- this code bloack is used to loop the data in the database -->
+      {% for data in queryset %}
+      <div class="list-group mb-3">
+        <a href="#" class="list-group-item list-group-item-action">Name: {{data.date}}</a>
+        <a href="#" class="list-group-item list-group-item-action">Age: {{data.expenseChoices}}</a>
+        <a href="#" class="list-group-item list-group-item-action">Level: {{data.value}}</a>
+        <a href="#" class="list-group-item list-group-item-action">Level: {{data.note}}</a>
+      </div>
+      {% endfor %}
+      <hr>  
+    </div>
+</body>
+</html>
