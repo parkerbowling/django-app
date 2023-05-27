@@ -4,7 +4,7 @@
 
 ### Phase 1
  - Implement bare bones of website:
-    1. Expense Tracker &#2705
+    1. Expense Tracker :white_check_mark:
     2. Receipes Database
 
 ### Phase 2
