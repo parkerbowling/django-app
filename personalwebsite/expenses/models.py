@@ -1,6 +1,5 @@
 from django.db import models
 from django.urls import reverse
-import datetime
 from django.utils.timezone import now
 
 # Create your models here.
@@ -42,10 +41,3 @@ class expenseReport(models.Model):
 
     def __str__(self):
         return self.name
-
-    def get_absolute_url(self):
-        return reverse("_detail", kwargs={"pk": self.pk})
-    
-    #may need this later
-    # def get_now():
-    #     return datetime.now().strftime("%Y-%m-%d")
