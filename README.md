@@ -5,9 +5,10 @@
 ### Phase 1
  - Implement bare bones of website:
     1. Expense Tracker :white_check_mark:
-    2. Receipes Database
+    2. Receipes Database :white_check_mark:
 
 ### Phase 2
+ - Add user authentication and SEARCH feature for receipes
  - Style website that looks acceptable and not from 2006
  - Add charts and data viz for expense data
 
