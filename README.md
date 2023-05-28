@@ -14,7 +14,7 @@
  - Style website that looks acceptable and not from 2006
  - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month
 
- - ##### Data Viz Needs
+ - #### Data Viz Needs
     - since I include income, show savings over expenses for that month
     - Compare across categories (comparing across different categories wouldn't make sense)
     - Month versus month comparison
