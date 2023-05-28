@@ -2,6 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.timezone import now
 
+#see forms.py
 class recipesModel(models.Model):
     
     MEALCHOICE = (
