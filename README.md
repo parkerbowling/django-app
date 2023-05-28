@@ -3,21 +3,32 @@
 ## Plan for website
 
 ### Phase 1
- - Implement bare bones of website:
+ - Implement bare bones of website that stores input in database tables:
     1. Expense Tracker :white_check_mark:
-    2. Receipes Database :white_check_mark:
+    2. Recipes Database :white_check_mark:
 
 ### Phase 2
- - Add user authentication and SEARCH feature for receipes
+ - Add Search feature for receipes
+ - Add Display for a queried recipe
+ - Add user authentication
  - Style website that looks acceptable and not from 2006
- - Add charts and data viz for expense data
+ - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month
+
+ - ##### Data Viz Needs
+    - since I include income, show savings over expenses for that month
+    - Compare across categories (comparing across different categories wouldn't make sense)
+    - Month versus month comparison
+    - add types of charts to choose from (bar, line graph, pie chart)
+    - week versus week comparison?
+    - Year over Year comparison (eventually) 
 
 #### Feature Wishlist
 
 - Expense Tracker
     1. OCR for receipts instead of manually entering it
+    2. Add a budget feature that gives goals on what you want to spend that month
 
 - Receipes Database
-    1. Select a receipe (or many) and compile a grocery list from those receipe(s) selected
-    2. Grocery store Djikstra's algorithm - find the shortest path to buying all grocery store items
-    3. OCR for receipes instead of manual imput
+    1. Select a recipe (or many) and compile a grocery list from those recipe(s) selected
+    2. OCR for recipes instead of manual imput
+    3. Grocery store Djikstra's algorithm - find the shortest path to buying all grocery store items
