@@ -18,7 +18,7 @@ def add_expense(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Expense added!')
-            return redirect('add_expense')
+            return redirect('expenses:add_expense')
         
     context = {
         "form":form
