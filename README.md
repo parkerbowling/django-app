@@ -30,5 +30,6 @@
 
 - Receipes Database
     1. Select a recipe (or many) and compile a grocery list from those recipe(s) selected
-    2. OCR for recipes instead of manual imput
-    3. Grocery store Djikstra's algorithm - find the shortest path to buying all grocery store items
+    2. Have a URL input that has a recipe on it and scraps the recipe off of it and stores it into the database 
+    3. OCR for recipes instead of manual imput
+    4. Grocery store Djikstra's algorithm - find the shortest path to buying all grocery store items
