@@ -56,9 +56,6 @@ def recipe_home(request):
         
     add_recipe_button_click = request.GET.get("add-new-recipe")    
     print('eheree')
-    if add_recipe_button_click:
-        print('here')
-        add_recipe(request)
     
     context = {
         "recipes":recipes
