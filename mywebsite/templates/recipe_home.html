@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% url 'recipe:add_recipe' as add_recipe %}
 
 {% block title %}
     <title>Recipe Book</title>
@@ -7,12 +8,11 @@
 {% block body_content %}
 
 <form>
-    <input type="text" name ="q">
+    <input type="text" name="q">
     <button>Search</button>
 </form>
-<form>
-    <button name="add-recipe">Add Recipe</button>
-</form>
+
+<a name="add-new-recipe" href="{{add_recipe}}">Add Recipe</a>
 
 <p>Recipes should populate here</p>
 {% for recipe in recipes %}

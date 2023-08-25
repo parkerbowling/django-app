@@ -1,7 +1,16 @@
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
 from .forms import recipesForm
 from django.contrib import messages
 from .models import recipesModel
+from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank
+
+from django.views.generic import (
+    CreateView,
+    ListView,
+    UpdateView,
+    DetailView,
+    DeleteView
+)
 
 #have one view for adding a recipe
 def add_recipe(request):
@@ -19,6 +28,9 @@ def add_recipe(request):
     }
     return render(request, 'add_recipe.html',context)
 
+def redirect_to_add_recipe(request):
+    return redirect('add_recipe')
+
 #view for search for a recipe
 def search_recipe(request):
     model = recipesModel
@@ -29,15 +41,24 @@ def search_recipe(request):
 #view for displaying a recipe
 
 #default view for recipe homepage
+#will want to add trigram similarity eventually, django package <-
 def recipe_home(request):
-    #recipes = recipesModel.objects.all()
+    #get query
     q = request.GET.get("q")
     
     if q:
-        recipes = recipesModel.objects.filter(title__icontains=q)
-    else:
-        recipes = None
+        vector = SearchVector('title')
+        query = SearchQuery(q)
+        recipes = recipesModel.objects.annotate(rank=SearchRank(vector,query)).filter(rank__gte=0.001).order_by('-rank')
     
+    else:
+        recipes = recipesModel.objects.all()
+        
+    add_recipe_button_click = request.GET.get("add-new-recipe")    
+    print('eheree')
+    if add_recipe_button_click:
+        print('here')
+        add_recipe(request)
     
     context = {
         "recipes":recipes
