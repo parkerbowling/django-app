@@ -15,7 +15,7 @@ from django.views.generic import (
 )
 
 class RecipeListView(ListView):
-    template_name = "recipe_home.html"
+    template_name = "recipes/recipesmodel_list.html"
     queryset = recipesModel.objects.all()
     
 class RecipeAddView(CreateView):
