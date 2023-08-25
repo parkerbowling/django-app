@@ -2,7 +2,7 @@
 
 {% url 'home' as home %}
 {% url 'expenses:add_expense' as add_expense %}
-{% url 'recipes:add_recipe' as add_recipe %}
+{% url 'recipes:recipe_home' as recipe_home %}
 
 <html lang="en">
 <head>
@@ -15,7 +15,7 @@
     <div class="navbar">
       <a href="{{home}}">Home</a>
       <a href="{{add_expense}}">Expense Tracker</a>
-      <a href="{{add_recipe}}">Receipe Database</a>
+      <a href="{{recipe_home}}">Receipe Database</a>
     </nav>
   {% endblock navbar %}
 
