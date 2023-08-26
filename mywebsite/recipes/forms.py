@@ -1,6 +1,7 @@
 from django import forms
 from .models import recipesModel
 from datetime import datetime
+from django.urls import reverse
 
 class recipesForm(forms.ModelForm):
     #make meal choices
@@ -37,4 +38,7 @@ class recipesForm(forms.ModelForm):
     class Meta:
         model = recipesModel
         fields = ['date','title','meal_type','ingredients','instructions']
+        
+    def get_absolute_url(self):
+        return reverse("recipes:recipe_detail", kwargs={"id": self.id})
     

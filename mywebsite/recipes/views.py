@@ -41,3 +41,15 @@ class RecipeAddView(CreateView):
     def form_valid(self, form):
         print(form.cleaned_data)
         return super().form_valid(form)
+    
+class RecipeUpdateView(DetailView):
+    template_name = "add_recipe.html"
+    form_class = recipesForm
+    
+    def form_valid(self, form):
+        print(form.cleaned_data)
+        return super().form_valid(form)
+    
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(recipesModel,id=id_)
