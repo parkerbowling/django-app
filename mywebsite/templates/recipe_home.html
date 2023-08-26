@@ -13,8 +13,6 @@
 
 <a name="add-new-recipe" href="{% url 'recipes:add_recipe'%}">Add Recipe</a>
 
-{% comment %} <p>Recipes should populate here</p> {% endcomment %}
-
 {% block detail_view %}
 {% endblock detail_view %}
 
@@ -22,6 +20,6 @@
 {% endblock search_view %}
 
 {% for recipe in all_search_results %}
-    <h5>{{ recipe.title }}</h5>
+    <h5><a href="{% url 'recipes:recipe_detail' recipe.id %}">{{ recipe.title }}</a></h5>
 {% endfor %}
 {% endblock body_content %}

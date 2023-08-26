@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import RecipeListView, RecipeAddView, RecipeDetailView, RecipeSearchView
+from .views import RecipeListView, RecipeAddView, RecipeDetailView
 
 #declares app name for namespace
 app_name = 'recipes'
@@ -10,6 +10,6 @@ urlpatterns = [
     path('recipe_home/',RecipeListView.as_view(),name='recipe_home'),
     path('add_recipe/',RecipeAddView.as_view(),name='add_recipe'),
     path('<int:id>/',RecipeDetailView.as_view(),name='recipe_detail'),
-    path('search_recipe/',RecipeSearchView.as_view(),name='search_recipe')
+    # path('search_recipe/',RecipeSearchView.as_view(),name='search_recipe')
     
 ]
