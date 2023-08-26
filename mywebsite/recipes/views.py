@@ -1,23 +1,38 @@
-from django.forms.models import BaseModelForm
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404
 from .forms import recipesForm
-from django.contrib import messages
 from .models import recipesModel
 from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank
 
 from django.views.generic import (
     CreateView,
     ListView,
-    UpdateView,
     DetailView,
-    DeleteView
+    TemplateView
 )
 
 class RecipeListView(ListView):
-    template_name = "recipes/recipesmodel_list.html"
+    template_name = "recipe_home.html"
+    queryset = recipesModel.objects.all()
+    context_object_name = 'all_search_results'
+    
+    def get_queryset(self):
+       result = super(RecipeListView, self).get_queryset()
+       query = self.request.GET.get('q')
+       if query:
+          postresult = recipesModel.objects.filter(title__icontains=query)
+          result = postresult
+       else:
+           result = recipesModel.objects.all()
+       return result
+    
+class RecipeDetailView(DetailView):
+    template_name = "recipe_detail.html"
     queryset = recipesModel.objects.all()
     
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(recipesModel,id=id_)
+            
 class RecipeAddView(CreateView):
     template_name = "add_recipe.html"
     queryset = recipesModel.objects.all()
@@ -27,58 +42,18 @@ class RecipeAddView(CreateView):
         print(form.cleaned_data)
         return super().form_valid(form)
     
-
-
-# #have one view for adding a recipe
-# def add_recipe(request):
-#     form = recipesForm(request.POST or None)
+class RecipeSearchView(TemplateView):
+    template_name = "recipe_search.html"
     
-#     if request.method == "POST":
-#         if form.is_valid():
-#             print("do we get here")
-#             form.save()
-#             messages.success(request,"Recipe Added!")
-#             return redirect('recipes:add_recipe')
+    def get(self, request, *args, **kwargs):
+        q = request.GET.get('q')
         
-#     context = {
-#         "form":form
-#     }
-#     return render(request, 'add_recipe.html',context)
-
-# def redirect_to_add_recipe(request):
-#     return redirect('add_recipe')
-
-# #view for search for a recipe
-# def search_recipe(request):
-#     model = recipesModel
-    
-    
-    
-    
-# #view for displaying a recipe
-
-# #default view for recipe homepage
-# #will want to add trigram similarity eventually, django package <-
-# def recipe_home(request):
-#     #get query
-#     q = request.GET.get("q")
-    
-#     if q:
-#         vector = SearchVector('title')
-#         query = SearchQuery(q)
-#         recipes = recipesModel.objects.annotate(rank=SearchRank(vector,query)).filter(rank__gte=0.001).order_by('-rank')
-    
-#     else:
-#         recipes = recipesModel.objects.all()
+        if q:
+            vector = SearchVector('title')
+            query = SearchQuery(q)
+            self.results = recipesModel.objects.annotate(rank=SearchRank(vector,query)).filter(rank__gte=0.001).order_by('-rank')
         
-#     add_recipe_button_click = request.GET.get("add-new-recipe")    
-#     print('eheree')
-#     if add_recipe_button_click:
-#         print('here')
-#         add_recipe(request)
+        return super().get(request, *args, **kwargs)
     
-#     context = {
-#         "recipes":recipes
-#     }
-    
-#     return render(request, 'recipe_home.html',context)
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(results=self.results, **kwargs)

@@ -21,8 +21,8 @@ class recipesModel(models.Model):
     
     
     def __str__(self):
-        return self.name
+        return self.title
     
     def get_absolute_url(self):
-        return reverse("recipes:add_recipe", kwargs={"id": self.id})
+        return reverse("recipes:recipe_detail", kwargs={"id": self.id})
     
