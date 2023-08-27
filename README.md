@@ -8,11 +8,13 @@
     2. Recipes Database :white_check_mark:
 
 ### Phase 2
- - Add Search feature for receipes
- - Add Display for a queried recipe
+ - Add Search feature for receipes :white_check_mark:
+ - Add Display for a queried recipe :white_check_mark:
  - Add user authentication
- - Style website that looks acceptable and not from 2006
+ - Start on data viz, look at section below for charts needed
  - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month
+
+ - Style website that looks acceptable and not from 2006
 
  - #### Data Viz Needs
     - since I include income, show savings over expenses for that month
