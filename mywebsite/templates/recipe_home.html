@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% url 'recipes:add_recipe' as add_recipe %}
 
 {% block title %}
     <title>Recipe Book</title>
@@ -12,10 +11,15 @@
     <button>Search</button>
 </form>
 
-<a name="add-new-recipe" href="{{add_recipe}}">Add Recipe</a>
+<a name="add-new-recipe" href="{% url 'recipes:add_recipe'%}">Add Recipe</a>
 
-<p>Recipes should populate here</p>
-{% for recipe in recipes %}
-    <h5>{{ recipe.title }}</h5>
+{% block detail_view %}
+{% endblock detail_view %}
+
+{% block search_view %}
+{% endblock search_view %}
+
+{% for recipe in all_search_results %}
+    <h5><a href="{% url 'recipes:recipe_detail' recipe.id %}">{{ recipe.title }}</a></h5>
 {% endfor %}
 {% endblock body_content %}

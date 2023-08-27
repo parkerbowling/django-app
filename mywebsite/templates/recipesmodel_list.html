@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% url 'recipe:add_recipe' as add_recipe %}
+
+{% block title %}
+    <title>Recipe Book</title>
+{% endblock title %}
+
+{% block body_content %}
+
+<form>
+    <input type="text" name="q">
+    <button>Search</button>
+</form>
+
+<a name="add-new-recipe" href="{{add_recipe}}">Add Recipe</a>
+
+<p>Recipes should populate here</p>
+{% for recipe in recipes %}
+    <h5>{{ recipe.title }}</h5>
+{% endfor %}
+{% endblock body_content %}

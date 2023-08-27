@@ -1,0 +1,7 @@
+{% extends recipe_home.html %}
+
+{% block search_view %}
+{% for result in results %}
+<h5>{{result.title}}</h5>
+{% endfor %}
+{% endblock %}
