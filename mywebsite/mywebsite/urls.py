@@ -18,17 +18,27 @@ from django.contrib import admin
 from django.urls import path, include
 # importing from app folder, the view file
 from expenses.views import home
+from auth_users.views import login_user
 
 urlpatterns = [
     #name admin path
     path('admin/', admin.site.urls),
     
     #name home path
-    path('', home, name="home"),
+    path('home/', home, name="home"),
+    
+    path('',login_user, name="login_user"),
+    
+    #name a login path
+    #path('auth_users/',include('auth_users.urls')),
 
     #name expenses urls by including expenses namespace
     path('expenses/',include('expenses.urls',namespace='expenses')),
     
     #name expenses urls by including recipes namespace
-    path('recipes/',include('recipes.urls',namespace='recipes'))
+    path('recipes/',include('recipes.urls',namespace='recipes')),
+    
+    path("auth_users/",include('auth_users.urls')),
+    path("auth_users/",include('django.contrib.auth.urls'))
+    
 ]
