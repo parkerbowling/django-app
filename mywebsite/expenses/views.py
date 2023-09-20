@@ -1,7 +1,9 @@
-from django.shortcuts import redirect, render, get_object_or_404
+from django.shortcuts import redirect, render
+from django.db.models import Count, Q, Sum
 from .models import expenseReport
 from .forms import expenseReportForm
 from django.contrib import messages
+from django.http import JsonResponse
 
 #temporary home page for now
 def home(request):
@@ -31,3 +33,44 @@ def add_expense(request):
     }
     return render(request, 'add_expense.html', context)
 
+def chart_data(request):
+    
+    #dynamically get the Categories in case I decide to add or remove one of them and make them unique
+    setCategories = expenseReport.objects.values("expenseChoices")
+    newSet = list(set([i[1] for s in [d.items() for d in setCategories] for i in s]))
+    
+    #name a json structure for inserting data into chart
+    allCategoryData = {
+        "name": "Expenses",
+        "data": []
+    }
+    
+    #for every category (remember not all categories may have appeared yet) sum the values and add to data
+    #will need to be able to filter on certain dates, like months and years
+    for i in newSet:
+        
+        #gets all values for category and sums
+        categorySum = expenseReport.objects.values("value").filter(expenseChoices=str(i)).aggregate(Sum('value'))['value__sum']
+
+        data = {
+            'name':str(i),
+            'y': float(categorySum)
+        }
+        allCategoryData['data'].append(data)
+    
+    #need to include updating for month and year selection
+    
+    #json chart configuration
+    chart = {
+        'chart': {'type': 'pie'},
+        'title': {'text': 'Total Expenses'},
+        'tooltip': {
+            'format': 
+                '{series.name}: <b>${y}</b><br/>',
+                'shared':'true'
+        },
+        'series': [allCategoryData]
+    }
+    
+    #return a JsonResponse so Highchart knows what to do with our data
+    return JsonResponse(chart)

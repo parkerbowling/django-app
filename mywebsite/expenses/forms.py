@@ -42,7 +42,7 @@ class expenseReportForm(forms.ModelForm):
         label="Date")
     
     #title of recipe and adds a placeholder in the textbox
-    title = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'recipe Name'}),
+    title = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'Expense Title'}),
         label="Title")
     
     #gives a list of expense choices
@@ -64,5 +64,5 @@ class expenseReportForm(forms.ModelForm):
     class Meta:
         model = expenseReport
         fields = [
-            'date','expenseChoices','value','note'
+            'date','title','expenseChoices','value','note'
         ]
