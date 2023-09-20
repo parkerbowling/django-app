@@ -19,7 +19,12 @@
 {% block search_view %}
 {% endblock search_view %}
 
+    {% if not all_search_results %}
+<h5>No recipes found. I guess you will go hungry :(</h5>
+    {% endif %}
+
 {% for recipe in all_search_results %}
     <h5><a href="{% url 'recipes:recipe_detail' recipe.id %}">{{ recipe.title }}</a></h5>
 {% endfor %}
+
 {% endblock body_content %}

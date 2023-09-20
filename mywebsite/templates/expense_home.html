@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <title>Expense Home</title>
+{% endblock title %}
+
+{% block body_content %}
+
+<div name='add-expense'>
+    <a name="add-new-recipe" href="{% url 'expenses:add_expense'%}">Add Expense</a>
+</div>
+{% endblock body_content %}

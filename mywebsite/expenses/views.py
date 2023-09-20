@@ -8,6 +8,10 @@ def home(request):
     #render takes in a request and an HTML page to render to view
     return render(request, 'home.html')
 
+def expense_home(request):
+    
+    return render(request,'expense_home.html')
+
 #add_expense is the page where user can add expense
 def add_expense(request):
 

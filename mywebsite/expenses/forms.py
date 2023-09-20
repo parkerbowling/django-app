@@ -41,6 +41,10 @@ class expenseReportForm(forms.ModelForm):
         initial=datetime.today().strftime('%Y-%m-%d'),                     #inital gives the default value (today) and label, well, labels it
         label="Date")
     
+    #title of recipe and adds a placeholder in the textbox
+    title = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'recipe Name'}),
+        label="Title")
+    
     #gives a list of expense choices
     expenseChoices = forms.ChoiceField(widget=forms.Select,                #user is able to select from a list of options
                                        choices=CHOICE,                     #choices are assigned and label for client side

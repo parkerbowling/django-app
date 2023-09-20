@@ -6,5 +6,6 @@ app_name = 'expenses'
 
 #the url pattern that links expenses/add_expense to personalwebsite/urls.py
 urlpatterns = [
+    path('expense_home/',views.expense_home, name='expense_home'),
     path('add_expense/', views.add_expense, name='add_expense')
 ]

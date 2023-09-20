@@ -1,5 +1,4 @@
 from django.db import models
-from django.urls import reverse
 from django.utils.timezone import now
 
 #See forms.py for more details
@@ -36,9 +35,10 @@ class expenseReport(models.Model):
     
     #see forms for more details
     date = models.DateField(default=now)
+    title = models.CharField(max_length=128)
     expenseChoices = models.TextField(choices=EXPENSE_CHOICES)
     value = models.DecimalField(decimal_places=2,max_digits=1000)
     note = models.TextField(max_length=140)
 
     def __str__(self):
-        return self.name
+        return self.title
