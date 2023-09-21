@@ -9,4 +9,5 @@ urlpatterns = [
     path('expense_home/',views.expense_home, name='expense_home'),
     path('add_expense/', views.add_expense, name='add_expense'),
     path('json-example/data/',views.chart_data, name='chart_data'),
+    path('sankey-chart',views.sankey_chart,name='sankey_chart')
 ]

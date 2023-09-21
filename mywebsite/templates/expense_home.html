@@ -10,19 +10,34 @@
     <a name="add-new-recipe" href="{% url 'expenses:add_expense'%}">Add Expense</a>
 </div>
 
-<div name='overall-expense'>
-      <div id="container" data-url="{% url 'expenses:chart_data' %}"></div>
-      <script src="https://code.highcharts.com/highcharts.src.js"></script>
-      <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-      <script>
-        $.ajax({
-          url: $("#container").attr("data-url"),
-          dataType: 'json',
-          success: function (data) {
-            Highcharts.chart("container", data);
-          }
-        });
-      </script>
-
+<div class="row">
+    <div class="column" name='overall-expense'>
+        <div id="container0" data-url="{% url 'expenses:chart_data' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        <script src="https://code.highcharts.com/highcharts.src.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script>
+            $.ajax({
+            url: $("#container0").attr("data-url"),
+            dataType: 'json',
+            success: function (data) {
+                Highcharts.chart("container0", data);
+            }
+            });
+        </script>
+    </div> 
+    <div class="column" name="sankey-chart">
+        <div id="container1" data-url="{% url 'expenses:sankey_chart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        <script src="https://code.highcharts.com/highcharts.src.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script>
+            $.ajax({
+            url: $("#container1").attr("data-url"),
+            dataType: 'json',
+            success: function (data) {
+                Highcharts.chart("container1", data);
+            }
+            });
+        </script>
+    </div>
 </div>
 {% endblock body_content %}

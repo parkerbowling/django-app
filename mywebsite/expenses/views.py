@@ -38,7 +38,7 @@ def chart_data(request):
     #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     setCategories = expenseReport.objects.values("expenseChoices")
     newSet = list(set([i[1] for s in [d.items() for d in setCategories] for i in s]))
-    
+    newSet.remove("INCOME")
     #name a json structure for inserting data into chart
     allCategoryData = {
         "name": "Expenses",
@@ -62,7 +62,7 @@ def chart_data(request):
     
     #json chart configuration
     chart = {
-        'chart': {'type': 'pie'},
+        'chart': {'type': 'pie', 'renderTo':'container0'},
         'title': {'text': 'Total Expenses'},
         'tooltip': {
             'format': 
@@ -74,3 +74,32 @@ def chart_data(request):
     
     #return a JsonResponse so Highchart knows what to do with our data
     return JsonResponse(chart)
+
+def sankey_chart(request):
+    
+    setCategories = expenseReport.objects.values("expenseChoices")
+    newSet = list(set([i[1] for s in [d.items() for d in setCategories] for i in s]))
+    
+    #need to create something to dynamically mimic the sankey chart and build up the lists
+    
+    chart = {
+        'chart': {'type': 'sankey', 'renderTo':'container0'},
+        'title': {'text': 'Income and Savings Breakdown'},
+        'tooltip': {},
+        'keys':['from','to','weight'],
+        'data': [],
+    }
+    
+    return JsonResponse(chart)
+
+        # ['Total Assets', 'Current-Assets', 143.71],
+        # ['Total Assets', 'Non-Current Assets', 180.17],
+
+        # ['Current-Assets', 'Cash', 90.94],
+        # ['Current-Assets', 'Receivables', 37.44],
+        # ['Current-Assets', 'Inventory', 4.06],
+        # ['Current-Assets', 'Other CA', 11.26],
+
+        # ['Non-Current Assets', 'Net PPE ', 36.76],
+        # ['Non-Current Assets', 'Investments ', 100.88],
+        # ['Non-Current Assets', 'Other NCA', 42.52]
