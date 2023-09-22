@@ -66,3 +66,21 @@ class expenseReportForm(forms.ModelForm):
         fields = [
             'date','title','expenseChoices','value','note'
         ]
+        
+#what is going on here? need to create dropdown selector??
+#        
+#   [Category] -- From [Month/Year] to [Month/Year] by [Month/Year]
+#
+#
+# class expenseComparison(forms.ModelForm):
+#     date = forms.DateInput(widget=forms.DateTimeInput(
+#     attrs={'class':'date-time-input','placeholder':'YYYY-MM-DD',}),    #gives it an html class name and placeholder which is redundent
+#         initial=datetime.today().strftime('%Y-%m-%d'),                 #inital gives the default value (today) and label, well, labels it
+#         label="Date")    
+    
+#     def getMonth(self):
+#         return self.date.month
+    
+#     def getYear(self):
+#         return self.date.year
+    

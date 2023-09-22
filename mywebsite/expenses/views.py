@@ -5,7 +5,7 @@ from .forms import expenseReportForm
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
-from helper import getExpenseCategories
+from . import helper as h
 
 #temporary home page for now
 def home(request):
@@ -39,7 +39,7 @@ def expense_piechart(request):
     
     #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     newSet = []
-    newSet = getExpenseCategories(newSet)
+    newSet = h.getExpenseCategories(newSet)
     newSet.remove("INCOME")
     #name a json structure for inserting data into chart
     allCategoryData = {
@@ -113,7 +113,7 @@ def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
     newSet = []
-    newSet = getExpenseCategories(newSet)
+    newSet = h.getExpenseCategories(newSet)
     newSet.remove("INCOME")
     
     data = []
@@ -266,6 +266,6 @@ def expense_sankeychart(request):
 
 def expense_comparison_barchart(request):
     newSet = []
-    newSet = getExpenseCategories(newSet)
+    newSet = h.getExpenseCategories(newSet)
     newSet.remove("INCOME")
     
