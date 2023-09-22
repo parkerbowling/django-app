@@ -12,29 +12,30 @@
 
 <div class="row">
     <div class="column" name='overall-expense'>
-        <div id="container0" data-url="{% url 'expenses:chart_data' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        <div id="expenses-pie-container" data-url="{% url 'expenses:chart_data' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script>
             $.ajax({
-            url: $("#container0").attr("data-url"),
+            url: $("#expenses-pie-container").attr("data-url"),
             dataType: 'json',
             success: function (data) {
-                Highcharts.chart("container0", data);
+                Highcharts.chart("expenses-pie-container", data);
             }
             });
         </script>
     </div> 
     <div class="column" name="sankey-chart">
-        <div id="container1" data-url="{% url 'expenses:sankey_chart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        <div id="expenses-sankey-container" data-url="{% url 'expenses:sankey_chart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://code.highcharts.com/modules/sankey.js"></script>
         <script>
             $.ajax({
-            url: $("#container1").attr("data-url"),
+            url: $("#expenses-sankey-container").attr("data-url"),
             dataType: 'json',
             success: function (data) {
-                Highcharts.chart("container1", data);
+                Highcharts.chart("expenses-sankey-container", data);
             }
             });
         </script>

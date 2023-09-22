@@ -12,11 +12,14 @@
 </head>
 <body>
   {% block navbar %}
+  
+  <nav>
     <div class="navbar">
       <a href="{{home}}">Home</a>
       <a href="{{expense_home}}">Expense Tracker</a>
-      <a href="{{recipe_home}}">Receipe Database</a>
-    </nav>
+      <a href="{{recipe_home}}">Recipe Database</a>
+    </div>
+  </nav> 
   {% endblock navbar %}
 
   {% block body_content %}
