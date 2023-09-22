@@ -5,6 +5,7 @@ from .forms import expenseReportForm
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
+from helper import getExpenseCategories
 
 #temporary home page for now
 def home(request):
@@ -34,11 +35,11 @@ def add_expense(request):
     }
     return render(request, 'add_expense.html', context)
 
-def chart_data(request):
+def expense_piechart(request):
     
     #dynamically get the Categories in case I decide to add or remove one of them and make them unique
-    setCategories = expenseReport.objects.values("expenseChoices")
-    newSet = list(set([i[1] for s in [d.items() for d in setCategories] for i in s]))
+    newSet = []
+    newSet = getExpenseCategories(newSet)
     newSet.remove("INCOME")
     #name a json structure for inserting data into chart
     allCategoryData = {
@@ -51,8 +52,6 @@ def chart_data(request):
     dateNow = datetime.now()
     currentYear = dateNow.year
     currentMonth = dateNow.month
-    print(currentYear)
-    print(currentMonth)
     
     for i in newSet:
         
@@ -92,7 +91,12 @@ def chart_data(request):
         
     #json chart configuration
     chart = {
-        'chart': {'type': 'pie', 'renderTo':'expenses-pie-container'},
+        'chart': {
+            'type': 'pie', 
+            # 'height': 300,
+            # 'width': 1000,
+            'renderTo':'expenses-pie-container'
+        },
         'title': {'text': chartTitle},
         'tooltip': {
             'format': 
@@ -105,11 +109,11 @@ def chart_data(request):
     #return a JsonResponse so Highchart knows what to do with our data
     return JsonResponse(chart)
 
-def sankey_chart(request):
+def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
-    setCategories = expenseReport.objects.values("expenseChoices")
-    newSet = list(set([i[1] for s in [d.items() for d in setCategories] for i in s]))
+    newSet = []
+    newSet = getExpenseCategories(newSet)
     newSet.remove("INCOME")
     
     data = []
@@ -169,13 +173,18 @@ def sankey_chart(request):
     #add if else when chart wants to be changed
     chartTitle = ""
     if True:
-        chartTitle = f"Expense and Savings This Month {currentMonth}/{currentYear}"
+        chartTitle = f"Expenses and Savings This Month {currentMonth}/{currentYear}"
     # else:
     #     chartTitle = "Total Expenses All"
     
     #chart json
     chart = {
-        'chart': {'type': 'sankey','renderTo':'expenses-sankey-container'},
+        'chart': {
+            'type': 'sankey',
+            'renderTo':'expenses-sankey-container',
+            # 'height': 300,
+            # 'width': 1000,
+        },
         'title': {'text': chartTitle},
         'tooltip': {
         'headerFormat': None,
@@ -254,3 +263,9 @@ def sankey_chart(request):
     }
     
     return JsonResponse(chart)
+
+def expense_comparison_barchart(request):
+    newSet = []
+    newSet = getExpenseCategories(newSet)
+    newSet.remove("INCOME")
+    

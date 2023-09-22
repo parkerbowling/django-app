@@ -11,8 +11,8 @@
 </div>
 
 <div class="row">
-    <div class="column" name='overall-expense'>
-        <div id="expenses-pie-container" data-url="{% url 'expenses:chart_data' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    <div class="column" name='overall-expense' display="inline">
+        <div id="expenses-pie-container" data-url="{% url 'expenses:expense_piechart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script>
@@ -25,8 +25,8 @@
             });
         </script>
     </div> 
-    <div class="column" name="sankey-chart">
-        <div id="expenses-sankey-container" data-url="{% url 'expenses:sankey_chart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+    <div class="column" name="sankey-chart" display="inline">
+        <div id="expenses-sankey-container" data-url="{% url 'expenses:expense_sankeychart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="https://code.highcharts.com/modules/sankey.js"></script>

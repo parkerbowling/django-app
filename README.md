@@ -12,7 +12,8 @@
  - Add Display for a queried recipe :white_check_mark:
  - Add user authentication (still really janky needs updating eventually) :white_check_mark:
  - Start on data viz, look at section below for charts needed
- - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month
+ - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month (django-crontab library)
+ - Can the cron jobs be dynamically made (can a user add a reoccuring expense/income)
 
  - Style website that looks acceptable and not from 2006
 
@@ -23,12 +24,14 @@
     - add types of charts to choose from (bar, line graph, pie chart)
     - week versus week comparison?
     - Year over Year comparison (eventually) 
+    - Add a credit card percentage calculator -> based on what cashback you get for each card, calculate the average percent return over all expenses
 
 #### Feature Wishlist
 
 - Expense Tracker
     1. OCR for receipts instead of manually entering it
     2. Add a budget feature that gives goals on what you want to spend that month
+    3. Wrap the database around an A.I. (LLM) that can compute any data viz you ask it for
 
 - Receipes Database
     1. Select a recipe (or many) and compile a grocery list from those recipe(s) selected
