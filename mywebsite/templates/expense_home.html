@@ -40,5 +40,27 @@
             });
         </script>
     </div>
+<div class="row1">
+    <div class="column" name="comparison-chart" display="inline">
+        <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Save"/>
+        </form>
+        <div id="expenses-comparison-container" data-url="{% url 'expenses:expense_comparison_barchart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+            <script src="https://code.highcharts.com/highcharts.src.js"></script>
+            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+            <script src="https://code.highcharts.com/modules/sankey.js"></script>
+            <script>
+                $.ajax({
+                url: $("#expenses-comparison-container").attr("data-url"),
+                dataType: 'json',
+                success: function (data) {
+                    Highcharts.chart("expenses-comparison-container", data);
+                }
+                });
+            </script>
+    </div>
+</div>
 </div>
 {% endblock body_content %}

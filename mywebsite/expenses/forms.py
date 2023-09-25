@@ -1,6 +1,32 @@
 from django import forms
 from .models import expenseReport
-from datetime import datetime
+from datetime import datetime, date
+
+class DateSelectorWidget(forms.MultiWidget):
+    def __init__(self, attrs=None):
+        days = [(day, day) for day in [1]]
+        months = [(month, month) for month in range(1, 13)]
+        years = [(year, year) for year in range(2022, (datetime.today().year)+10)]
+        widgets = [
+            #forms.Select(attrs=attrs,choices=days),
+            forms.HiddenInput(attrs=attrs),
+            forms.Select(attrs=attrs, choices=months),
+            forms.Select(attrs=attrs, choices=years),
+        ]
+        super().__init__(widgets, attrs)
+
+    def decompress(self, value):
+        if isinstance(value, date):
+            return [value.day, value.month, value.year]
+        elif isinstance(value, str):
+            year, month, day = value.split("-")
+            return [day, month, year]
+        return [None, None, None]
+
+    def value_from_datadict(self, data, files, name):
+        day, month, year = super().value_from_datadict(data, files, name)
+        # DateField expects a single string that it can parse into a date.
+        return "{}-{}-{}".format(year, month, day)
 
 class expenseReportForm(forms.ModelForm):
     #variable names which the machine sees, redundent but might help me later
@@ -72,15 +98,22 @@ class expenseReportForm(forms.ModelForm):
 #   [Category] -- From [Month/Year] to [Month/Year] by [Month/Year]
 #
 #
-# class expenseComparison(forms.ModelForm):
-#     date = forms.DateInput(widget=forms.DateTimeInput(
-#     attrs={'class':'date-time-input','placeholder':'YYYY-MM-DD',}),    #gives it an html class name and placeholder which is redundent
-#         initial=datetime.today().strftime('%Y-%m-%d'),                 #inital gives the default value (today) and label, well, labels it
-#         label="Date")    
+class expenseComparison(forms.Form):
+      
+    date = forms.DateField(widget=DateSelectorWidget(),label="From:")
+    #attrs={'onchange': 'expenseComparison.submit();'}
+    toDate = forms.DateField(widget=DateSelectorWidget(),label="To:")
     
-#     def getMonth(self):
-#         return self.date.month
+    def getFromMonth(self):
+        return self.date.month
     
-#     def getYear(self):
-#         return self.date.year
+    def getFromYear(self):
+        return self.date.year
+    
+    def getToMonth(self):
+        return self.toDate.month
+    
+    def getToYear(self):
+        return self.toDate.year
+    
     

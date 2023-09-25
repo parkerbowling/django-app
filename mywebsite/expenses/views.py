@@ -1,10 +1,12 @@
 from django.shortcuts import redirect, render
-from django.db.models import Count, Q, Sum
+from django.contrib import sessions
+from django.db.models import Sum
 from .models import expenseReport
-from .forms import expenseReportForm
+from .forms import expenseReportForm, expenseComparison
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
+import json
 from . import helper as h
 
 #temporary home page for now
@@ -14,7 +16,27 @@ def home(request):
 
 def expense_home(request):
     
-    return render(request,'expense_home.html')
+    formFilter = expenseComparison(request.POST or None)
+    
+    if request.method == "POST":
+        
+        if formFilter.is_valid():
+            #some wacky error with this
+            obj = json.dumps(formFilter.cleaned_data['date'], indent=4, sort_keys=True, default=str)
+            request.session['date'] = obj  #formFilter.cleaned_data['date']
+            print('inside of form valid')
+            #print(request.session['date'])
+            
+            #now I need to implement the second button fully and transfer the data between sessions
+            print(formFilter.cleaned_data['toDate'])
+            #this does nothing
+            #print(request.session.get("filterComparison"))
+    
+    context = {
+        "form":formFilter
+    }
+    
+    return render(request,'expense_home.html', context)
 
 #add_expense is the page where user can add expense
 def add_expense(request):
@@ -268,4 +290,26 @@ def expense_comparison_barchart(request):
     newSet = []
     newSet = h.getExpenseCategories(newSet)
     newSet.remove("INCOME")
+    
+    #gets the date input from the user (STILL NEED THIS TO BE AUTOMATICALLY CHANGED ON FILTER CHANGE)
+    formDate = request.session.get("date")
+    fromYear = formDate[1:5]
+    fromMonth = formDate[6:8]
+    
+    chartTitle = "Comparison Chart"
+    
+    #print("data:",stuff)
+    print("inside of comparison")
+    
+    chart = {
+        'chart': {
+            'type': 'sankey',
+            'renderTo':'expenses-sankey-container',
+            # 'height': 300,
+            # 'width': 1000,
+        },
+        'title': {'text': chartTitle},
+    }
+    
+    return JsonResponse(chart)
     
