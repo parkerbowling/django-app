@@ -46,6 +46,11 @@
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Save"/>
+            <ul class="messages">
+                {% for message in messages %}
+                <li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+                {% endfor %}
+            </ul>
         </form>
         <div id="expenses-comparison-container" data-url="{% url 'expenses:expense_comparison_barchart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
             <script src="https://code.highcharts.com/highcharts.src.js"></script>

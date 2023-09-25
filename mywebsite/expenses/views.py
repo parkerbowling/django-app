@@ -1,5 +1,4 @@
 from django.shortcuts import redirect, render
-from django.contrib import sessions
 from django.db.models import Sum
 from .models import expenseReport
 from .forms import expenseReportForm, expenseComparison
@@ -20,19 +19,34 @@ def expense_home(request):
     
     if request.method == "POST":
         
+        #maybe I don't need this check if I know the data is limited to the input options --> 
+        #if "invalid date" error still persists then try removing this check
         if formFilter.is_valid():
-            #some wacky error with this
-            obj = json.dumps(formFilter.cleaned_data['date'], indent=4, sort_keys=True, default=str)
+            
+            fromDateData = formFilter.cleaned_data['date']
+            toDateData = formFilter.cleaned_data['toDate']
+            categoryFilterData = formFilter.cleaned_data['expenseLabelCategory'] 
+            
+            if fromDateData > toDateData:
+                print("the dates are wrong",fromDateData,toDateData)
+            else:
+                #need to add some sort of message here
+                return render(request,"expense_home.html",{"form":formFilter})
+                        
+            #From date data
+            obj = json.dumps(fromDateData, indent=4, sort_keys=True, default=str)
             request.session['date'] = obj  #formFilter.cleaned_data['date']
             print('inside of form valid')
-            #print(request.session['date'])
+    
+            obj1 = json.dumps(toDateData, indent=4, sort_keys=True, default=str)
+            request.session['toDate'] = obj1
             
-            #now I need to implement the second button fully and transfer the data between sessions
-            #I need to compare the to and from dates and make sure they are a valid range -> that one date is greater than the other and I can do that here.
+            print(categoryFilterData)
+            obj2 = categoryFilterData
+            request.session['expenseLabelCategory'] = obj2
             
-            print(formFilter.cleaned_data['toDate'])
-            #this does nothing
-            #print(request.session.get("filterComparison"))
+        
+            print(fromDateData,toDateData)
     
     context = {
         "form":formFilter
@@ -63,7 +77,7 @@ def expense_piechart(request):
     
     #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     newSet = []
-    newSet = h.getExpenseCategories(newSet)
+    newSet = h.getExpenseCategories()
     newSet.remove("INCOME")
     #name a json structure for inserting data into chart
     allCategoryData = {
@@ -137,7 +151,7 @@ def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
     newSet = []
-    newSet = h.getExpenseCategories(newSet)
+    newSet = h.getExpenseCategories()
     newSet.remove("INCOME")
     
     data = []
@@ -290,13 +304,22 @@ def expense_sankeychart(request):
 
 def expense_comparison_barchart(request):
     newSet = []
-    newSet = h.getExpenseCategories(newSet)
+    newSet = h.getExpenseCategories()
     newSet.remove("INCOME")
     
     #gets the date input from the user (STILL NEED THIS TO BE AUTOMATICALLY CHANGED ON FILTER CHANGE)
-    formDate = request.session.get("date")
-    fromYear = formDate[1:5]
-    fromMonth = formDate[6:8]
+    fromDate = request.session.get("date")
+    fromYear = fromDate[1:5]
+    fromMonth = fromDate[6:8]
+    #print(fromYear,fromMonth)
+    
+    #get toDate
+    toDate = request.session.get("toDate")
+    toYear = toDate[1:5]
+    toMonth = toDate[6:8]
+    #print(toYear,toMonth)
+    
+    filterCategory = request.session.get("expenseLabelCategory")
     
     chartTitle = "Comparison Chart"
     

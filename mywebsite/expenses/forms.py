@@ -1,6 +1,7 @@
 from django import forms
 from .models import expenseReport
 from datetime import datetime, date
+from . import helper as h
 
 class DateSelectorWidget(forms.MultiWidget):
     def __init__(self, attrs=None):
@@ -100,9 +101,12 @@ class expenseReportForm(forms.ModelForm):
 #
 class expenseComparison(forms.Form):
       
-    date = forms.DateField(widget=DateSelectorWidget(),label="From:")
+    #GET RID OF REQUIRED SOMETHING IS WRONG
+    date = forms.DateField(widget=DateSelectorWidget(),label="From:",required=False)
     #attrs={'onchange': 'expenseComparison.submit();'}
-    toDate = forms.DateField(widget=DateSelectorWidget(),label="To:")
+    toDate = forms.DateField(widget=DateSelectorWidget(),label="To:",initial=datetime.today(),required=False)
+    
+    expenseLabelCategory = forms.ChoiceField(choices=[(x,x) for x in h.getExpenseCategories()],label="Category",required=False,initial="INCOME")
     
     def getFromMonth(self):
         return self.date.month
