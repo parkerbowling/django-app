@@ -28,6 +28,8 @@ def expense_home(request):
             #print(request.session['date'])
             
             #now I need to implement the second button fully and transfer the data between sessions
+            #I need to compare the to and from dates and make sure they are a valid range -> that one date is greater than the other and I can do that here.
+            
             print(formFilter.cleaned_data['toDate'])
             #this does nothing
             #print(request.session.get("filterComparison"))
