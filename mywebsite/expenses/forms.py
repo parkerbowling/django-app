@@ -99,12 +99,20 @@ class expenseReportForm(forms.ModelForm):
 #   [Category] -- From [Month/Year] to [Month/Year] by [Month/Year]
 #
 #
+class DateInput(forms.DateInput):
+    input_type = 'date'
+    initial = f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}"
+
 class expenseComparison(forms.Form):
       
     #GET RID OF REQUIRED SOMETHING IS WRONG
-    date = forms.DateField(widget=DateSelectorWidget(),label="From:",required=False)
-    #attrs={'onchange': 'expenseComparison.submit();'}
-    toDate = forms.DateField(widget=DateSelectorWidget(),label="To:",initial=datetime.today(),required=False)
+    # date = forms.DateField(widget=DateSelectorWidget(),label="From:")
+    # #attrs={'onchange': 'expenseComparison.submit();'}
+    # toDate = forms.DateField(widget=DateSelectorWidget(),label="To:",initial=datetime.today())
+    
+    date = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
+    
+    toDate = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
     
     expenseLabelCategory = forms.ChoiceField(choices=[(x,x) for x in h.getExpenseCategories()],label="Category",required=False,initial="INCOME")
     
@@ -119,5 +127,15 @@ class expenseComparison(forms.Form):
     
     def getToYear(self):
         return self.toDate.year
+    
+    def clean(self):
+        cleaned_data = super(expenseComparison, self).clean()
+        from_time = cleaned_data.get("date")
+        end_time = cleaned_data.get("toDate")
+
+        if from_time and end_time:
+            if end_time < from_time:
+                raise forms.ValidationError("End date cannot be earlier than start date!")
+        return cleaned_data
     
     

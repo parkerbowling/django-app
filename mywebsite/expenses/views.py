@@ -1,5 +1,6 @@
 from django.shortcuts import redirect, render
 from django.db.models import Sum
+from django import forms
 from .models import expenseReport
 from .forms import expenseReportForm, expenseComparison
 from django.contrib import messages
@@ -15,38 +16,34 @@ def home(request):
 
 def expense_home(request):
     
-    formFilter = expenseComparison(request.POST or None)
-    
-    if request.method == "POST":
+    if request.method == "GET":
         
-        #maybe I don't need this check if I know the data is limited to the input options --> 
-        #if "invalid date" error still persists then try removing this check
+        #initalize empty form (figure out how to preload an inital value?)
+        formFilter = expenseComparison()
+
+    else:
+        #get date on a POST
+        formFilter = expenseComparison(request.POST)
+        
         if formFilter.is_valid():
-            
+
+            #get data from cleaned, valid form
             fromDateData = formFilter.cleaned_data['date']
             toDateData = formFilter.cleaned_data['toDate']
             categoryFilterData = formFilter.cleaned_data['expenseLabelCategory'] 
-            
-            if fromDateData > toDateData:
-                print("the dates are wrong",fromDateData,toDateData)
-            else:
-                #need to add some sort of message here
-                return render(request,"expense_home.html",{"form":formFilter})
                         
             #From date data
             obj = json.dumps(fromDateData, indent=4, sort_keys=True, default=str)
             request.session['date'] = obj  #formFilter.cleaned_data['date']
-            print('inside of form valid')
-    
+
+            #To date data
             obj1 = json.dumps(toDateData, indent=4, sort_keys=True, default=str)
             request.session['toDate'] = obj1
             
-            print(categoryFilterData)
+            #filter category
             obj2 = categoryFilterData
             request.session['expenseLabelCategory'] = obj2
             
-        
-            print(fromDateData,toDateData)
     
     context = {
         "form":formFilter
@@ -311,15 +308,16 @@ def expense_comparison_barchart(request):
     fromDate = request.session.get("date")
     fromYear = fromDate[1:5]
     fromMonth = fromDate[6:8]
-    #print(fromYear,fromMonth)
+    print(fromYear,fromMonth)
     
     #get toDate
     toDate = request.session.get("toDate")
     toYear = toDate[1:5]
     toMonth = toDate[6:8]
-    #print(toYear,toMonth)
+    print(toYear,toMonth)
     
     filterCategory = request.session.get("expenseLabelCategory")
+    print(filterCategory)
     
     chartTitle = "Comparison Chart"
     
@@ -327,14 +325,43 @@ def expense_comparison_barchart(request):
     print("inside of comparison")
     
     chart = {
-        'chart': {
-            'type': 'sankey',
-            'renderTo':'expenses-sankey-container',
-            # 'height': 300,
-            # 'width': 1000,
+        "chart": {
+            "type": 'column'
         },
-        'title': {'text': chartTitle},
+        "title": {
+            "text": chartTitle, 
+        },
+        "xAxis": {
+            "categories": ['USA', 'China', 'Brazil', 'EU', 'India', 'Russia'],
+            "crosshair": "true",
+        },
+        "yAxis": {
+            "min": 0,
+            "title": {
+                "text": '1000 metric tons (MT)'
+            }
+        },
+        "tooltip": {
+            "valueSuffix": ' (1000 MT)'
+        },
+        "plotOptions": {
+            "column": {
+                "pointPadding": 0.2,
+                "borderWidth": 0
+            }
+        },
+        "series": [
+            {
+                "name": 'Corn',
+                "data": [406292, 260000, 107000, 68300, 27500, 14500]
+            },
+            {
+                "name": 'Wheat',
+                "data": [51086, 136000, 5500, 141000, 107180, 77000]
+            }
+        ]
     }
+    
     
     return JsonResponse(chart)
     
