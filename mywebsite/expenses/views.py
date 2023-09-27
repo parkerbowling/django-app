@@ -324,6 +324,24 @@ def expense_comparison_barchart(request):
     #print("data:",stuff)
     print("inside of comparison")
     
+    data = []
+    
+    bar = {
+        "name":"",
+        "data":[]
+    }
+    
+    #if not All categories:
+    #   for each month in list of months:
+    #       get the sum of the category and store in a list
+    #       
+    #   compute average of sums of categories
+    #else all categories:
+    #   for each month in list of months for each category:
+    #       get the sum of the category and store in specifc list for that category
+    #       
+    #   get average of all expenses over all months
+    
     chart = {
         "chart": {
             "type": 'column'
