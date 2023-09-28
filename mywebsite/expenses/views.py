@@ -319,30 +319,31 @@ def expense_comparison_barchart(request):
     toMonth = toDate[1]
     toDay = toDate[2].strip('"')
     
+    #get category
     filterCategory = request.session.get("expenseLabelCategory")
-    #print(filterCategory)
     
+    #title
     chartTitle = "Comparison Chart"
     
-    #print("data:",stuff)
-    #print("inside of comparison")
-    
+    #initalize for chart json
     data = []
-    
+     
+    #get list of months from range input
     month_list = period_range(start=f"{fromYear}-{fromMonth}-{fromDay}", end=f"{toYear}-{toMonth}-{toDay}", freq='M')
     month_list = [month.strftime("%m-%Y") for month in month_list]
-    #print(month_list)
-    
     categoryLabelList = month_list
     
+    #do something if only one category is requested
     if filterCategory != "All Expenses":
     
+        #data for each bar
         bar = {
             "name":filterCategory,
             "type":'column',
             "data":[]
         }
         
+        #date for average
         average = {
             'type': 'spline',
             'name': 'Average',
@@ -351,8 +352,9 @@ def expense_comparison_barchart(request):
         
         listOfDataSum = []
             
-        #   for each month in list of months:
+        #for each month
         for d in month_list:
+            
     #       get the sum of the category and store in a list        
             dataSum = expenseReport.objects.values("value"
                     ).filter(
@@ -366,23 +368,23 @@ def expense_comparison_barchart(request):
                         
             listOfDataSum.append(float(dataSum))
             
-        #   compute average of sums of categories
-            
+        #compute average of sums of categories    
         bar["data"] = listOfDataSum
         average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
         data.append(bar)
         data.append(average)
-        #print(data)
 
-    else:
+    else: #for all expenses
         
+        #average data (still need to implement this)
         average = {
             'type': 'spline',
             'name': 'Average',
             'data': []
         }   
 
-        for c in h.getExpenseCategories():
+        #for each expense category
+        for c in newSet:
             
             bar = {
                 "name":c,
@@ -392,8 +394,10 @@ def expense_comparison_barchart(request):
             
             listOfDataSum = []
             
+            #for each month, get the sums
             for d in month_list:
-        #       get the sum of the category and store in a list        
+                
+                #get the sum of the category and store in a list        
                 dataSum = expenseReport.objects.values("value"
                         ).filter(
                             date__year=d[3:], date__month=d[:2]
@@ -403,7 +407,7 @@ def expense_comparison_barchart(request):
                 
                 if dataSum == None:
                     dataSum = 0.0
-                    #do I need this? Maybe not, but maybe it is better without it
+                    #do I need this 'continue'? Maybe not, but maybe it is better without it
                     #continue
                             
                 listOfDataSum.append(float(dataSum))
@@ -454,11 +458,3 @@ def expense_comparison_barchart(request):
     
     return JsonResponse(chart)
     
-    # {
-    #     "name": 'Corn',
-    #     "data": [406292, 260000, 107000, 68300, 27500, 14500]
-    # },
-    # {
-    #     "name": 'Wheat',
-    #     "data": [51086, 136000, 5500, 141000, 107180, 77000]
-    # }
