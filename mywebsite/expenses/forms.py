@@ -114,7 +114,7 @@ class expenseComparison(forms.Form):
     
     toDate = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
     
-    expenseLabelCategory = forms.ChoiceField(choices=[(x,x) for x in h.getExpenseCategories()],label="Category",required=False,initial="INCOME")
+    expenseLabelCategory = forms.ChoiceField(choices=[(x,x) for x in h.getExpenseCategories("all")],label="Category",required=False,initial="INCOME")
     
     def getFromMonth(self):
         return self.date.month

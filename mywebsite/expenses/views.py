@@ -1,6 +1,5 @@
 from django.shortcuts import redirect, render
 from django.db.models import Sum
-from django import forms
 from .models import expenseReport
 from .forms import expenseReportForm, expenseComparison
 from django.contrib import messages
@@ -8,6 +7,8 @@ from django.http import JsonResponse
 from datetime import datetime
 import json
 from . import helper as h
+from pandas import period_range
+from numpy import average as avg
 
 #temporary home page for now
 def home(request):
@@ -306,61 +307,140 @@ def expense_comparison_barchart(request):
     
     #gets the date input from the user (STILL NEED THIS TO BE AUTOMATICALLY CHANGED ON FILTER CHANGE)
     fromDate = request.session.get("date")
-    fromYear = fromDate[1:5]
-    fromMonth = fromDate[6:8]
-    print(fromYear,fromMonth)
+    fromDate = fromDate.split("-")
+    fromYear = fromDate[0].strip('"')
+    fromMonth = fromDate[1]
+    fromDay = fromDate[2].strip('"')
     
     #get toDate
     toDate = request.session.get("toDate")
-    toYear = toDate[1:5]
-    toMonth = toDate[6:8]
-    print(toYear,toMonth)
+    toDate = toDate.split("-")
+    toYear = toDate[0].strip('"')
+    toMonth = toDate[1]
+    toDay = toDate[2].strip('"')
     
     filterCategory = request.session.get("expenseLabelCategory")
-    print(filterCategory)
+    #print(filterCategory)
     
     chartTitle = "Comparison Chart"
     
     #print("data:",stuff)
-    print("inside of comparison")
+    #print("inside of comparison")
     
     data = []
     
-    bar = {
-        "name":"",
-        "data":[]
-    }
+    month_list = period_range(start=f"{fromYear}-{fromMonth}-{fromDay}", end=f"{toYear}-{toMonth}-{toDay}", freq='M')
+    month_list = [month.strftime("%m-%Y") for month in month_list]
+    #print(month_list)
     
-    #if not All categories:
-    #   for each month in list of months:
-    #       get the sum of the category and store in a list
-    #       
-    #   compute average of sums of categories
-    #else all categories:
-    #   for each month in list of months for each category:
-    #       get the sum of the category and store in specifc list for that category
-    #       
-    #   get average of all expenses over all months
+    categoryLabelList = month_list
+    
+    if filterCategory != "All Expenses":
+    
+        bar = {
+            "name":filterCategory,
+            "type":'column',
+            "data":[]
+        }
+        
+        average = {
+            'type': 'spline',
+            'name': 'Average',
+            'data': []
+        }   
+        
+        listOfDataSum = []
+            
+        #   for each month in list of months:
+        for d in month_list:
+    #       get the sum of the category and store in a list        
+            dataSum = expenseReport.objects.values("value"
+                    ).filter(
+                        date__year=d[3:], date__month=d[:2]
+                    ).filter(
+                        expenseChoices=str(filterCategory)).aggregate(
+                    Sum('value'))['value__sum']
+            
+            if dataSum == None:
+                dataSum = 0.0
+                        
+            listOfDataSum.append(float(dataSum))
+            
+        #   compute average of sums of categories
+            
+        bar["data"] = listOfDataSum
+        average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
+        data.append(bar)
+        data.append(average)
+        #print(data)
+
+    else:
+        
+        average = {
+            'type': 'spline',
+            'name': 'Average',
+            'data': []
+        }   
+
+        for c in h.getExpenseCategories():
+            
+            bar = {
+                "name":c,
+                "type":'column',
+                "data":[]
+            }
+            
+            listOfDataSum = []
+            
+            for d in month_list:
+        #       get the sum of the category and store in a list        
+                dataSum = expenseReport.objects.values("value"
+                        ).filter(
+                            date__year=d[3:], date__month=d[:2]
+                        ).filter(
+                            expenseChoices=str(c)).aggregate(
+                        Sum('value'))['value__sum']
+                
+                if dataSum == None:
+                    dataSum = 0.0
+                    #do I need this? Maybe not, but maybe it is better without it
+                    #continue
+                            
+                listOfDataSum.append(float(dataSum))
+                
+            bar['data'] = listOfDataSum
+            data.append(bar)
+            average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
+            
+    average = {
+            'type': 'spline',
+            'name': 'Average',
+            'data': []
+        }   
     
     chart = {
         "chart": {
-            "type": 'column'
+            "type": 'column',
+            'renderTo':'expenses-comparison-container',
         },
         "title": {
             "text": chartTitle, 
         },
         "xAxis": {
-            "categories": ['USA', 'China', 'Brazil', 'EU', 'India', 'Russia'],
+            "categories": categoryLabelList,
             "crosshair": "true",
         },
         "yAxis": {
             "min": 0,
             "title": {
-                "text": '1000 metric tons (MT)'
+                "text": 'Dollars'
             }
         },
         "tooltip": {
-            "valueSuffix": ' (1000 MT)'
+            'headerFormat': None,
+            'valueSuffix':'Dollars',
+            'pointFormat':
+                '{series.name}: ${point.y:.2f}',
         },
         "plotOptions": {
             "column": {
@@ -368,18 +448,17 @@ def expense_comparison_barchart(request):
                 "borderWidth": 0
             }
         },
-        "series": [
-            {
-                "name": 'Corn',
-                "data": [406292, 260000, 107000, 68300, 27500, 14500]
-            },
-            {
-                "name": 'Wheat',
-                "data": [51086, 136000, 5500, 141000, 107180, 77000]
-            }
-        ]
+        "series": data
     }
     
     
     return JsonResponse(chart)
     
+    # {
+    #     "name": 'Corn',
+    #     "data": [406292, 260000, 107000, 68300, 27500, 14500]
+    # },
+    # {
+    #     "name": 'Wheat',
+    #     "data": [51086, 136000, 5500, 141000, 107180, 77000]
+    # }
