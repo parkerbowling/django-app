@@ -334,7 +334,7 @@ def expense_comparison_barchart(request):
     categoryLabelList = month_list
     
     #do something if only one category is requested
-    if filterCategory != "All Expenses":
+    if filterCategory != "All Expenses" and filterCategory != "Savings":
     
         #data for each bar
         bar = {
@@ -350,6 +350,46 @@ def expense_comparison_barchart(request):
             'data': []
         }   
         
+        listOfDataSum = []
+            
+        #for each month
+        for d in month_list:
+            
+    #       get the sum of the category and store in a list        
+            dataSum = expenseReport.objects.values("value"
+                    ).filter(
+                        date__year=d[3:], date__month=d[:2]
+                    ).filter(
+                        expenseChoices=str(filterCategory)).aggregate(
+                    Sum('value'))['value__sum']
+            
+            if dataSum == None:
+                dataSum = 0.0
+                        
+            listOfDataSum.append(float(dataSum))
+            
+        #compute average of sums of categories    
+        bar["data"] = listOfDataSum
+        average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
+        data.append(bar)
+        data.append(average)
+    
+    #this needs work!
+    elif filterCategory == "Savings":
+
+        bar = {
+            "name":filterCategory,
+            "type":'column',
+            "data":[]
+        }
+        
+        #date for average
+        average = {
+            'type': 'spline',
+            'name': 'Average',
+            'data': []
+        }         
+
         listOfDataSum = []
             
         #for each month
@@ -415,6 +455,15 @@ def expense_comparison_barchart(request):
             bar['data'] = listOfDataSum
             data.append(bar)
             average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
+            
+            #get average of each month and not total
+    
+    #Need to do these before MD
+    #1. Average for all expenses
+    #1a. Add Savings to categories
+    #2. credit card chart
+    #3. Better display for recipes
+    #4. Edit expense categories-> make gas separate and put car expenses with Home improvement
             
     average = {
             'type': 'spline',

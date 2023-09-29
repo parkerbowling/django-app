@@ -9,5 +9,6 @@ def getExpenseCategories(option=None):
     
     if option == "all":
         rList.append("All Expenses")
+        rList.append("Savings")
     
     return rList
