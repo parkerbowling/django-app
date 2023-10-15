@@ -391,28 +391,61 @@ def expense_comparison_barchart(request):
         }         
 
         listOfDataSum = []
+        allThings = []
+             
+        #for each expense category
+        for c in newSet:
             
-        #for each month
-        for d in month_list:
+            bar = {
+                "name":'Savings',
+                "type":'column',
+                "data":[]
+            }
             
-    #       get the sum of the category and store in a list        
-            dataSum = expenseReport.objects.values("value"
-                    ).filter(
-                        date__year=d[3:], date__month=d[:2]
-                    ).filter(
-                        expenseChoices=str(filterCategory)).aggregate(
-                    Sum('value'))['value__sum']
+            listOfDataSum = []
+
+            #for each month, get the sums
+            for d in month_list:
+                
+                #get the sum of the category and store in a list        
+                dataSum = expenseReport.objects.values("value"
+                        ).filter(
+                            date__year=d[3:], date__month=d[:2]
+                        ).filter(
+                            expenseChoices=str(c)).aggregate(
+                        Sum('value'))['value__sum']
+                
+                if dataSum == None:
+                    dataSum = 0.0
+                    #do I need this 'continue'? Maybe not, but maybe it is better without it
+                    #continue
+                            
+                listOfDataSum.append(float(dataSum))
+                #print(listOfDataSum)
+                
+            firstMonthTotal = 0
+            middleMonthTotal = 0
+            lastMonthTotal = 0
             
-            if dataSum == None:
-                dataSum = 0.0
-                        
-            listOfDataSum.append(float(dataSum))
+            totalsOfEachMonth = [0] * len(month_list)
+
+            #fix this, works for two months but not more than that
+            # print("-----------")
+            allThings.append(listOfDataSum)
+            # print("-----------")
             
-        #compute average of sums of categories    
-        bar["data"] = listOfDataSum
-        average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
+            #how to do this?
+            #how to get all categories per month totaled
+            
+        for i in allThings:
+            firstMonthTotal += i[0]
+            middleMonthTotal += i[1]
+            lastMonthTotal += i[2]
+        print(allThings)
+            
+        bar['data'] = [firstMonthTotal,middleMonthTotal,lastMonthTotal]
         data.append(bar)
-        data.append(average)
+        average["data"] = [avg([firstMonthTotal,lastMonthTotal]) for i in range(len([firstMonthTotal,lastMonthTotal]))]
 
     else: #for all expenses
         
@@ -421,7 +454,7 @@ def expense_comparison_barchart(request):
             'type': 'spline',
             'name': 'Average',
             'data': []
-        }   
+        }
 
         #for each expense category
         for c in newSet:

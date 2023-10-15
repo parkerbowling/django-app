@@ -52,6 +52,27 @@
                 {% endfor %}
             </ul>
         </form>
+
+        <script>
+            $(document).on('submit','#filterComparison', function(e) {
+                e.preventDefault();
+                $.ajax({
+                    url: "expense_home/",
+                    type: "POST",
+                    data: {
+                         date: $("id_date").val(),
+                         toDate: $("id_toDate").val(),
+                         expenseLabelCategory: $("id_expenseLabelCategory").val(),
+                        }
+                    success : function(json) {
+                            //$('#post-text').val(''); // remove the value from the input
+                            console.log(json); // log the returned json to the console
+                            console.log("success"); // another sanity check
+                        },
+                })
+            })
+        </script>
+
         <div id="expenses-comparison-container" data-url="{% url 'expenses:expense_comparison_barchart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
             <script src="https://code.highcharts.com/highcharts.src.js"></script>
             <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
