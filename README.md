@@ -1,5 +1,17 @@
 # django-app
 
+
+## Implement ideas for website
+
+    1. What if there was a website that could find the fastest path in a grocery story to find all your items?
+        - User would build grocery list for a specific grocery store and a shortest path algo would generate
+        - User would also be able to search for a specific item and see its location in the store
+    2. What if there was a way to find the cheapest items in a grocery store to build the cheapest grocery list?
+        - User would choose a location (or mile range) to set the searchable grocery stores
+        - User would add items to a grocery list and filter to how many grocery stores they want to build the cheapest list from
+            - if one store, build the cheapest list from one store in the area
+            - if more than one store, build a list from multiple stores to get the cheapest list
+
 ## Plan for website
 
 ### Phase 1
