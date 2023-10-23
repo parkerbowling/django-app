@@ -76,7 +76,10 @@ def expense_piechart(request):
     #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     newSet = []
     newSet = h.getExpenseCategories()
-    newSet.remove("INCOME")
+    try:
+        newSet.remove("INCOME")
+    except ValueError:
+        print("no income reported")
     #name a json structure for inserting data into chart
     allCategoryData = {
         "name": "Expenses",
@@ -150,8 +153,11 @@ def expense_sankeychart(request):
     #get category names, should these be helper functions?
     newSet = []
     newSet = h.getExpenseCategories()
-    newSet.remove("INCOME")
-    
+    try:
+        newSet.remove("INCOME")
+    except ValueError:
+        print("no income reported")
+
     data = []
     
     #get current dates
@@ -303,7 +309,10 @@ def expense_sankeychart(request):
 def expense_comparison_barchart(request):
     newSet = []
     newSet = h.getExpenseCategories()
-    newSet.remove("INCOME")
+    try:
+        newSet.remove("INCOME")
+    except ValueError:
+        print("no income reported")
     
     #gets the date input from the user (STILL NEED THIS TO BE AUTOMATICALLY CHANGED ON FILTER CHANGE)
     fromDate = request.session.get("date")
