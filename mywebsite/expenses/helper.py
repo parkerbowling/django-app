@@ -56,7 +56,7 @@ def getAllExpenses_SavingsInMonthRange(month_list):
             incomeBal = 0.0   
         
         #savings = income - expenses
-        totalSavings = incomeBal - totalSavings
+        totalSavings = float(incomeBal) - float(totalSavings)
         
         listOfDataSum.append(totalSavings)
         
@@ -68,8 +68,8 @@ def getAllExpenses_SavingsInMonthRange(month_list):
     #bar["data"] = listOfDataSum
     #average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
     
+    for i in listOfDataSum:
+        i = round(i,2)
     
-    
-    #get income for each month
-    #calculate Savings for each month and return JSON format to be rendered to website
+    return listOfDataSum
     

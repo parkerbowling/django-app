@@ -413,49 +413,13 @@ def expense_comparison_barchart(request):
             
             listOfDataSum = []
 
-            #for each month, get the sums
-            for d in month_list:
-                
-                #get the sum of the category and store in a list        
-                dataSum = expenseReport.objects.values("value"
-                        ).filter(
-                            date__year=d[3:], date__month=d[:2]
-                        ).filter(
-                            expenseChoices=str(c)).aggregate(
-                        Sum('value'))['value__sum']
-                
-                if dataSum == None:
-                    dataSum = 0.0
-                    #do I need this 'continue'? Maybe not, but maybe it is better without it
-                    #continue
-                            
-                listOfDataSum.append(float(dataSum))
-                #print(listOfDataSum)
-                
-            firstMonthTotal = 0
-            middleMonthTotal = 0
-            lastMonthTotal = 0
+        savingsList = h.getAllExpenses_SavingsInMonthRange(month_list)
             
-            totalsOfEachMonth = [0] * len(month_list)
-
-            #fix this, works for two months but not more than that
-            # print("-----------")
-            allThings.append(listOfDataSum)
-            # print("-----------")
-            
-            #how to do this?
-            #how to get all categories per month totaled
-            
-        for i in allThings:
-            firstMonthTotal += i[0]
-            middleMonthTotal += i[1]
-            lastMonthTotal += i[2]
-        print(allThings)
-            
-        bar['data'] = [firstMonthTotal,middleMonthTotal,lastMonthTotal]
+        bar['data'] = savingsList
         data.append(bar)
-        average["data"] = [avg([firstMonthTotal,lastMonthTotal]) for i in range(len([firstMonthTotal,lastMonthTotal]))]
-
+        average['data'] = [avg(savingsList) for i in range(len(savingsList))]
+        data.append(average)
+    
     else: #for all expenses
         
         #average data (still need to implement this)
@@ -497,6 +461,7 @@ def expense_comparison_barchart(request):
             bar['data'] = listOfDataSum
             data.append(bar)
             average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
+            data.append(average)
             
             #get average of each month and not total
     
