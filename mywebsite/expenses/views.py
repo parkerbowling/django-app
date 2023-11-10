@@ -429,6 +429,7 @@ def expense_comparison_barchart(request):
             'data': []
         }
 
+
         #for each expense category
         for c in newSet:
             
@@ -455,19 +456,44 @@ def expense_comparison_barchart(request):
                     dataSum = 0.0
                     #do I need this 'continue'? Maybe not, but maybe it is better without it
                     #continue
-                            
+                           
                 listOfDataSum.append(float(dataSum))
                 
+        
             bar['data'] = listOfDataSum
             data.append(bar)
-            average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
-            data.append(average)
             
-            #get average of each month and not total
-    
+        listoftotalexpenses = []
+        
+        for d in month_list:
+            
+            totalPerMonth = 0
+            
+            for c in newSet:
+                dataSum = expenseReport.objects.values("value"
+                    ).filter(
+                        date__year=d[3:], date__month=d[:2]
+                    ).filter(
+                        expenseChoices=str(c)).aggregate(
+                    Sum('value'))['value__sum']
+            
+                if dataSum == None:
+                    dataSum = 0.0
+                    #do I need this 'continue'? Maybe not, but maybe it is better without it
+                    #continue
+                
+                totalPerMonth += float(dataSum)
+            
+            listoftotalexpenses.append(totalPerMonth)
+        
+        
+        print(listoftotalexpenses)
+        average["data"] = [avg(listoftotalexpenses) for i in range(len(listoftotalexpenses))]
+        data.append(average)
+            
+    #get average of each month and not total
     #Need to do these before MD
     #1. Average for all expenses
-    #1a. Add Savings to categories
     #2. credit card chart
     #3. Better display for recipes
     #4. Edit expense categories-> make gas separate and put car expenses with Home improvement
