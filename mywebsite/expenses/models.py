@@ -4,7 +4,7 @@ from django.utils.timezone import now
 #See forms.py for more details
 class expenseReport(models.Model):    
     RENT_MORTAGAGE = 'RENT_MORTGAGE'
-    GAS_REPAIRS = 'GAS_REPAIRS'
+    GAS = 'GAS'
     INCOME = 'INCOME'
     TAXES = 'TAXES'
     UTILITIES = 'UTILITIES'
@@ -13,13 +13,15 @@ class expenseReport(models.Model):
     ENTERTAINMENT = 'ENTERTAINMENT'
     TRAVEL = 'TRAVEL'
     SHOPPING = 'SHOPPING'
-    HOME_IMPROVEMENT = 'HOME_IMPROVEMENT'
+    REPAIRS = 'REPAIRS'
     HEALTHCARE = 'HEALTHCARE'
     GIVING = 'GIVING'
+    SELF_CARE = 'SELF_CARE'
+    MISCELLANEOUS = 'MISCELLANEOUS'
 
     EXPENSE_CHOICES = (
         (RENT_MORTAGAGE,'Rent/Mortgage'),
-        (GAS_REPAIRS, 'Gas/Vehicle Repairs'),
+        (GAS, 'Gas'),
         (INCOME, 'Income'),
         (TAXES, 'Taxes'),
         (UTILITIES, 'Utilites'),
@@ -28,9 +30,11 @@ class expenseReport(models.Model):
         (ENTERTAINMENT, 'Entertainment'),
         (TRAVEL, 'Travel'),
         (SHOPPING, 'Shopping'),
-        (HOME_IMPROVEMENT, 'Home Improvement and Repairs'),
+        (REPAIRS, 'Repairs'),
         (HEALTHCARE, 'Healthcare'),    
-        (GIVING,'Giving')
+        (GIVING,'Giving'),
+        (SELF_CARE,'Self Care'),
+        (MISCELLANEOUS, 'Miscellaneous')
     )
     
     #see forms for more details

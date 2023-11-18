@@ -486,10 +486,9 @@ def expense_comparison_barchart(request):
             
             listoftotalexpenses.append(totalPerMonth)
         
-        
         print(listoftotalexpenses)
-        average["data"] = [avg(listoftotalexpenses) for i in range(len(listoftotalexpenses))]
-        data.append(average)
+        #average["data"] = [avg(listoftotalexpenses) for i in range(len(listoftotalexpenses))]
+        #data.append(average)
             
     #get average of each month and not total
     #Need to do these before MD

@@ -32,7 +32,7 @@ class DateSelectorWidget(forms.MultiWidget):
 class expenseReportForm(forms.ModelForm):
     #variable names which the machine sees, redundent but might help me later
     RENT_MORTAGAGE = 'RENT_MORTGAGE'
-    GAS_REPAIRS = 'GAS_REPAIRS'
+    GAS = 'GAS'
     INCOME = 'INCOME'
     TAXES = 'TAXES'
     UTILITIES = 'UTILITIES'
@@ -41,14 +41,16 @@ class expenseReportForm(forms.ModelForm):
     ENTERTAINMENT = 'ENTERTAINMENT'
     TRAVEL = 'TRAVEL'
     SHOPPING = 'SHOPPING'
-    HOME_IMPROVEMENT = 'HOME_IMPROVEMENT'
+    REPAIRS = 'REPAIRS'
     HEALTHCARE = 'HEALTHCARE'
     GIVING = 'GIVING'
+    SELF_CARE = 'SELF_CARE'
+    MISCELLANEOUS = 'MISCELLANEOUS'
 
     #choices for the user. the first item is what the machine sees, the second is what the user sees
     CHOICE = (
         (RENT_MORTAGAGE,'Rent/Mortgage'),
-        (GAS_REPAIRS, 'Gas/Vehicle Repairs'),
+        (GAS, 'Gas'),
         (INCOME, 'Income'),
         (TAXES, 'Taxes'),
         (UTILITIES, 'Utilites'),
@@ -57,9 +59,11 @@ class expenseReportForm(forms.ModelForm):
         (ENTERTAINMENT, 'Entertainment'),
         (TRAVEL, 'Travel'),
         (SHOPPING, 'Shopping'),
-        (HOME_IMPROVEMENT, 'Home Improvement and Repairs'),
+        (REPAIRS, 'Repairs'),
         (HEALTHCARE, 'Healthcare'),    
-        (GIVING, 'Giving')
+        (GIVING, 'Giving'),
+        (SELF_CARE, 'Self Care'),
+        (MISCELLANEOUS, 'Miscellaneous')
     )
     
     #the first field the user is able to select
