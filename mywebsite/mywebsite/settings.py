@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['personalfinancewebsite']
+ALLOWED_HOSTS = ['personalfinancewebsite.herokuapp.com']
 
 
 # Application definition
@@ -87,13 +87,16 @@ WSGI_APPLICATION = 'mywebsite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+PASSWORD = os.environ.get('PASSWORD')
+USER = os.environ.get('USER')
+
 #database definition
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres', #on laptop this changes to parkerbowling
-        'PASSWORD': 'password',
+        'USER': USER, #on laptop this changes to parkerbowling
+        'PASSWORD': PASSWORD,
         'HOST':'localhost',
         'PORT':'5432'
     }
@@ -139,7 +142,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+#location where django collect all static files
+STATIC_ROOT = os.path.join(BASE_DIR,'static')
+# location where you will store your static files
+STATICFILES_DIRS = [os.path.join(BASE_DIR,'project_name/static')]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
