@@ -34,7 +34,6 @@
     - Compare across categories (comparing across different categories wouldn't make sense)
     - Month versus month comparison
     - add types of charts to choose from (bar, line graph, pie chart)
-    - week versus week comparison?
     - Year over Year comparison (eventually) 
     - Add a credit card percentage calculator -> based on what cashback you get for each card, calculate the average percent return over all expenses
 
@@ -49,7 +48,8 @@
     1. Select a recipe (or many) and compile a grocery list from those recipe(s) selected
     2. Have a URL input that has a recipe on it and scraps the recipe off of it and stores it into the database 
     3. OCR for recipes instead of manual imput
-    4. Grocery store Djikstra's algorithm - find the shortest path to buying all grocery store items
+    5. It would be really cool to build this dynamically, so when a user first launches the website, they can choose what categories they want, and also add or remove categories as needed
+    6. Be able to have a GUI that can insert data into the database without having to boot up the server and code all the time.
 
 - Overall Website
     1. Improve user authentication
