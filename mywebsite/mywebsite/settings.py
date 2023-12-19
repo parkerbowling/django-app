@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     #added my apps 
     'expenses',
     'recipes',
-    'auth_users'
 ]
 
 MIDDLEWARE = [
