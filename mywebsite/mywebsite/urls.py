@@ -38,7 +38,7 @@ urlpatterns = [
     #name expenses urls by including recipes namespace
     path('recipes/',include('recipes.urls',namespace='recipes')),
     
-    path("auth_users/",include('auth_users.urls')),
-    path("auth_users/",include('django.contrib.auth.urls'))
+    #path("auth_users/",include('auth_users.urls')),
+    #path("auth_users/",include('django.contrib.auth.urls'))
     
 ]
