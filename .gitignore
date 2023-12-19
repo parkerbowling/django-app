@@ -2,3 +2,4 @@ tutorial/
 web/
 .env
 expense.py
+mywebsite/auth_users/

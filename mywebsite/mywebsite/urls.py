@@ -25,9 +25,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     #name home path
-    path('home/', home, name="home"),
+    #path('home/', home, name="home"),
     
-    path('',login_user, name="login_user"),
+    path('', home, name="home"),
     
     #name a login path
     #path('auth_users/',include('auth_users.urls')),
