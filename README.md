@@ -8,7 +8,7 @@
     3. Create .env file and add SECRETKEY, USER, and PASSWORD as it appears in settings.py file.
     4. Make sure that USER and PASSWORD matches with the user and password you create for the PostgreSQL database.
     5. Also make sure that settings.py NAME for the database matches what the name of the database you created in PostgreSQL.
-    6. run ```python3 manage.py runserver``` to run the server.
+    6. run python3 manage.py runserver to run the server.
 
 ## Plan for website
 
