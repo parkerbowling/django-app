@@ -429,7 +429,6 @@ def expense_comparison_barchart(request):
             'data': []
         }
 
-
         #for each expense category
         for c in newSet:
             
@@ -486,16 +485,7 @@ def expense_comparison_barchart(request):
             
             listoftotalexpenses.append(totalPerMonth)
         
-        print(listoftotalexpenses)
-        #average["data"] = [avg(listoftotalexpenses) for i in range(len(listoftotalexpenses))]
-        #data.append(average)
-            
-    #get average of each month and not total
-    #Need to do these before MD
-    #1. Average for all expenses
-    #2. credit card chart
-    #3. Better display for recipes
-    #4. Edit expense categories-> make gas separate and put car expenses with Home improvement
+        #print(listoftotalexpenses)
             
     average = {
             'type': 'spline',
@@ -534,8 +524,7 @@ def expense_comparison_barchart(request):
             }
         },
         "series": data
-    }
-    
+    } 
     
     return JsonResponse(chart)
     

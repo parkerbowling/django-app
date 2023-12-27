@@ -98,21 +98,12 @@ class expenseReportForm(forms.ModelForm):
             'date','title','expenseChoices','value','note'
         ]
         
-#what is going on here? need to create dropdown selector??
-#        
-#   [Category] -- From [Month/Year] to [Month/Year] by [Month/Year]
-#
-#
+
 class DateInput(forms.DateInput):
     input_type = 'date'
     initial = f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}"
 
 class expenseComparison(forms.Form):
-      
-    #GET RID OF REQUIRED SOMETHING IS WRONG
-    # date = forms.DateField(widget=DateSelectorWidget(),label="From:")
-    # #attrs={'onchange': 'expenseComparison.submit();'}
-    # toDate = forms.DateField(widget=DateSelectorWidget(),label="To:",initial=datetime.today())
     
     date = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
     

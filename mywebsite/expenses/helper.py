@@ -16,8 +16,8 @@ def getExpenseCategories(option=None):
 
 
 def getAllExpenses_SavingsInMonthRange(month_list):
-    #get all expenses for each month
-    
+
+    #get all expenses for each month    
     listOfExpenseCategories = getExpenseCategories()
     listOfExpenseCategories.remove("INCOME")
 
@@ -59,14 +59,6 @@ def getAllExpenses_SavingsInMonthRange(month_list):
         totalSavings = float(incomeBal) - float(totalSavings)
         
         listOfDataSum.append(totalSavings)
-        
-    #this should contain all my savings per each month
-    print(listOfDataSum)
-        
-    
-    #compute average of sums of categories    
-    #bar["data"] = listOfDataSum
-    #average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
     
     for i in listOfDataSum:
         i = round(i,2)
