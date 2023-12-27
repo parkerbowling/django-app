@@ -1,16 +1,14 @@
 # django-app
 
+## How to get started with website
 
-## Implement ideas for website
-
-    1. What if there was a website that could find the fastest path in a grocery story to find all your items?
-        - User would build grocery list for a specific grocery store and a shortest path algo would generate
-        - User would also be able to search for a specific item and see its location in the store
-    2. What if there was a way to find the cheapest items in a grocery store to build the cheapest grocery list?
-        - User would choose a location (or mile range) to set the searchable grocery stores
-        - User would add items to a grocery list and filter to how many grocery stores they want to build the cheapest list from
-            - if one store, build the cheapest list from one store in the area
-            - if more than one store, build a list from multiple stores to get the cheapest list
+    0. Ensure you are in a python virtual environment
+    1. Install python libraries from requirements.txt.
+    2. Download PostgreSQL for system.
+    3. Create .env file and add SECRETKEY, USER, and PASSWORD as it appears in settings.py file.
+    4. Make sure that USER and PASSWORD matches with the user and password you create for the PostgreSQL database.
+    5. Also make sure that settings.py NAME for the database matches what the name of the database you created in PostgreSQL.
+    6. run ```python3 manage.py runserver``` to run the server.
 
 ## Plan for website
 
@@ -23,16 +21,15 @@
  - Add Search feature for receipes :white_check_mark:
  - Add Display for a queried recipe :white_check_mark:
  - Add user authentication (still really janky needs updating eventually) :white_check_mark:
- - Start on data viz, look at section below for charts needed
+ - Start on data viz, look at section below for charts needed :white_check_mark:
  - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month (django-crontab library)
  - Can the cron jobs be dynamically made (can a user add a reoccuring expense/income)
 
  - Style website that looks acceptable and not from 2006
 
  - #### Data Viz Needs
-    - since I include income, show savings over expenses for that month
-    - Compare across categories (comparing across different categories wouldn't make sense)
-    - Month versus month comparison
+    - since I include income, show savings over expenses for that month :white_check_mark:
+    - Month versus month comparison :white_check_mark:
     - add types of charts to choose from (bar, line graph, pie chart)
     - Year over Year comparison (eventually) 
     - Add a credit card percentage calculator -> based on what cashback you get for each card, calculate the average percent return over all expenses
@@ -53,3 +50,14 @@
 
 - Overall Website
     1. Improve user authentication
+
+## Implement ideas for website
+
+    1. What if there was a website that could find the fastest path in a grocery story to find all your items?
+        - User would build grocery list for a specific grocery store and a shortest path algo would generate
+        - User would also be able to search for a specific item and see its location in the store
+    2. What if there was a way to find the cheapest items in a grocery store to build the cheapest grocery list?
+        - User would choose a location (or mile range) to set the searchable grocery stores
+        - User would add items to a grocery list and filter to how many grocery stores they want to build the cheapest list from
+            - if one store, build the cheapest list from one store in the area
+            - if more than one store, build a list from multiple stores to get the cheapest list
