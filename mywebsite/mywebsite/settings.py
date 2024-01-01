@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     #added my apps 
     'expenses',
     'recipes',
-    'chartGPT',
+    #'chartGPT',
 ]
 
 MIDDLEWARE = [
