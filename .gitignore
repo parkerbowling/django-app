@@ -3,3 +3,5 @@ web/
 .env
 expense.py
 mywebsite/auth_users/
+data.csv
+chartGPT/
