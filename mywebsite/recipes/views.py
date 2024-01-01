@@ -1,8 +1,7 @@
-from django.shortcuts import get_object_or_404
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
 from .forms import recipesForm
 from .models import recipesModel
-from django.contrib.postgres.search import SearchQuery, SearchVector, SearchRank
 
 from django.views.generic import (
     CreateView,
@@ -40,20 +39,23 @@ class RecipeAddView(CreateView):
     form_class = recipesForm
     
     def form_valid(self, form):
-        print(form.cleaned_data)
+        print(form.cleaned_data) 
         return super().form_valid(form)
     
 #success_url does not work, not sure why but can fix later
 class RecipeUpdateView(UpdateView):
-    template_name = "add_recipe.html"
+    template_name = "update_recipe.html"
     form_class = recipesForm
-    success_url = "/recipes/recipe_home"
+    success_url = "/recipes/recipe_detail"
     
     def form_valid(self, form):
         print(form.cleaned_data)
-        redirect_url = super(RecipeUpdateView, self).form_valid(form)
-        return redirect_url
+        #redirect_url = super(RecipeUpdateView, self).form_valid(form)
+        return super().form_valid(form)
     
     def get_object(self):
         id_ = self.kwargs.get("id")
         return get_object_or_404(recipesModel,id=id_)
+    
+    def get_success_url(self):
+        return reverse('recipes:recipe_detail',kwargs={'id': self.object.id })

@@ -1,8 +1,14 @@
 {% extends 'recipe_home.html' %}
 
+{% block body_content %}
+
+<a href="{% url 'recipes:recipe_update' object.id %}">Update Recipe</a>
+
 {% block detail_view %}
 <h2>{{ object.title }}</h2>
 <h3>{{ object.meal_type }}</h3>
-<h4>{{ object.ingredients }}</h4>
+<h4>{{ object.ingredients|linebreaksbr }}</h4>
 <h5>{{ object.instructions }}</h5>
 {% endblock %}
+
+{% endblock body_content %}

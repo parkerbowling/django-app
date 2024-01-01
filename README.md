@@ -22,8 +22,8 @@
  - Add Display for a queried recipe :white_check_mark:
  - Add user authentication (still really janky needs updating eventually) :white_check_mark:
  - Start on data viz, look at section below for charts needed :white_check_mark:
- - Add automatic reoccuring expenses like rent and bills and income that are automatically added each month (django-crontab library)
- - Can the cron jobs be dynamically made (can a user add a reoccuring expense/income)
+ - Fix UpdateView :white_check_mark:
+ - Order ingredient properly for recipe database :white_check_mark:
 
  - Style website that looks acceptable and not from 2006
 
