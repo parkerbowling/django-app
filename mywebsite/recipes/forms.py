@@ -20,14 +20,14 @@ class recipesForm(forms.ModelForm):
         label="Date")
     
     #title of recipe and adds a placeholder in the textbox
-    title = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'recipe Name'}),
+    title = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'Recipe Title'}),
         label="Title")
     
     #choose meal type with Select widget
     meal_type = forms.ChoiceField(widget=forms.Select,choices=MEALCHOICE,label="Meal Type")
     
     #list ingredients in comma separated values and add label
-    ingredients = forms.CharField(widget=forms.Textarea(attrs={'class':'note-input','placeholder':'Add commna separated ingredients','rows':1,'cols':33}),
+    ingredients = forms.CharField(widget=forms.Textarea(attrs={'class':'note-input','placeholder':'Add add each ingredient on a new line.','rows':1,'cols':45}),
                                                         label="Ingredients")
     
     #add instructions to be used later as well

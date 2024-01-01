@@ -24,6 +24,7 @@
  - Start on data viz, look at section below for charts needed :white_check_mark:
  - Fix UpdateView :white_check_mark:
  - Order ingredient properly for recipe database :white_check_mark:
+ - Add filters for recipes in search
 
  - Style website that looks acceptable and not from 2006
 
