@@ -6,15 +6,17 @@
     1. Install python libraries from requirements.txt.
     2. Download PostgreSQL for system.
     3. Create .env file and add SECRETKEY, USER, and PASSWORD as it appears in settings.py file.
-    4. Make sure that USER and PASSWORD matches with the user and password you create for the PostgreSQL database.
-    5. Also make sure that settings.py NAME for the database matches what the name of the database you created in PostgreSQL.
+    4. Make sure that USER and PASSWORD matches with the user and password you create for the 
+       PostgreSQL database.
+    5. Also make sure that settings.py NAME for the database matches what the name of the 
+       database you created in PostgreSQL.
     6. run python3 manage.py runserver to run the server.
 
-## Plan for website
+## Plan For Website
 
 ### Phase 3
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
- - Web scrape a recipe off of user input URL and automatically insert the recipe into the database
+ - Web scrape: user enters a URL of a recipe and it automatically gets scraped off and inserted into the database
  - Try to really clean up the code (if possible) and think about optimization
 
 ### Phase 2
@@ -48,16 +50,16 @@
     1. OCR for receipts instead of manually entering it
     2. Add a budget feature that gives goals on what you want to spend that month
     3. Wrap the database around an A.I. (LLM) that can compute any data viz you ask it for
+    4. *It would be really cool to build this dynamically, so when a user first launches the website, they can choose what categories they want, and also add or remove categories as needed (This would be more like an app that can save data)*
 
 - Receipes Database
     1. Select a recipe (or many) and compile a grocery list from those recipe(s) selected
     2. Have a URL input that has a recipe on it and scraps the recipe off of it and stores it into the database 
     3. OCR for recipes instead of manual imput
-    5. It would be really cool to build this dynamically, so when a user first launches the website, they can choose what categories they want, and also add or remove categories as needed
-    6. Be able to have a GUI that can insert data into the database without having to boot up the server and code all the time.
 
 - Overall Website
     1. Improve user authentication
+    2. Be able to have a GUI that can insert data into the database without having to boot up the server and code all the time.
 
 ### Random ideas for website
 
