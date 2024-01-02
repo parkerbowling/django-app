@@ -2,6 +2,6 @@ tutorial/
 web/
 .env
 expense.py
-mywebsite/auth_users/
+auth_users/
 data.csv
 chartGPT/

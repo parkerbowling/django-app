@@ -12,28 +12,35 @@
 
 ## Plan for website
 
-### Phase 1
- - Implement bare bones of website that stores input in database tables:
-    1. Expense Tracker :white_check_mark:
-    2. Recipes Database :white_check_mark:
+### Phase 3
+ - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
+ - Web scrape a recipe off of user input URL and automatically insert the recipe into the database
+ - Try to really clean up the code (if possible) and think about optimization
 
 ### Phase 2
- - Add Search feature for receipes :white_check_mark:
- - Add Display for a queried recipe :white_check_mark:
- - Add user authentication (still really janky needs updating eventually) :white_check_mark:
- - Start on data viz, look at section below for charts needed :white_check_mark:
- - Fix UpdateView :white_check_mark:
- - Order ingredient properly for recipe database :white_check_mark:
+ - ~~Add Search feature for receipes~~ :white_check_mark:
+ - ~~Add Display for a queried recipe~~ :white_check_mark:
+ - ~~Add user authentication (still really janky needs updating eventually)~~ :white_check_mark:
+ - ~~Start on data viz, look at section below for charts needed~~ :white_check_mark:
+ - ~~Fix UpdateView in recipes~~ :white_check_mark:
+ - ~~Order ingredient properly for recipe database~~ :white_check_mark:
  - Add filters for recipes in search
+ - Make sure instructions are also ordered vertically like ingredients
 
  - Style website that looks acceptable and not from 2006
 
+### Phase 1
+ - Implement bare bones of website that stores input in database tables:
+    1. ~~Expense Tracker~~ :white_check_mark:
+    2. ~~Recipes Database~~ :white_check_mark:
+
  - #### Data Viz Needs
-    - since I include income, show savings over expenses for that month :white_check_mark:
-    - Month versus month comparison :white_check_mark:
+    - ~~since I include income, show savings over expenses for that month~~ :white_check_mark:
+    - ~~Month versus month comparison~~ :white_check_mark:
     - add types of charts to choose from (bar, line graph, pie chart)
     - Year over Year comparison (eventually) 
     - Add a credit card percentage calculator -> based on what cashback you get for each card, calculate the average percent return over all expenses
+    - *Note*: not sure if the credit card chart would really be useful
 
 #### Feature Wishlist
 
@@ -52,7 +59,7 @@
 - Overall Website
     1. Improve user authentication
 
-## Implement ideas for website
+### Random ideas for website
 
     1. What if there was a website that could find the fastest path in a grocery story to find all your items?
         - User would build grocery list for a specific grocery store and a shortest path algo would generate
