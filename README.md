@@ -17,6 +17,8 @@
 ### Phase 3
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
  - Web scrape: user enters a URL of a recipe and it automatically gets scraped off and inserted into the database
+ - Fix Update recipe date bug
+ - Style website that looks acceptable and not from 2006
  - Try to really clean up the code (if possible) and think about optimization
 
 ### Phase 2
@@ -27,9 +29,7 @@
  - ~~Fix UpdateView in recipes~~ :white_check_mark:
  - ~~Order ingredient properly for recipe database~~ :white_check_mark:
  - ~~Add filters for recipes in search~~ :white_check_mark:
- - Make sure instructions are also ordered vertically like ingredients
-
- - Style website that looks acceptable and not from 2006
+ - ~~Make sure instructions are also ordered vertically like ingredients~~ :white_check_mark:
 
 ### Phase 1
  - Implement bare bones of website that stores input in database tables:

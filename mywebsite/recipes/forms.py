@@ -31,7 +31,7 @@ class recipesForm(forms.ModelForm):
                                                         label="Ingredients")
     
     #add instructions to be used later as well
-    instructions = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'Add instructions'}),
+    instructions = forms.CharField(widget=forms.Textarea(attrs={'class':'note-input','placeholder':'Add instructions','rows':1,'cols':45}),
                                                         label="Instructions")
     
     #metadata class for fields for form

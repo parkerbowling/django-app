@@ -68,7 +68,7 @@ class RecipeUpdateView(UpdateView):
     
     def form_valid(self, form):
         print(form.cleaned_data)
-        #redirect_url = super(RecipeUpdateView, self).form_valid(form)
+
         return super().form_valid(form)
     
     def get_object(self):
