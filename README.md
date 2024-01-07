@@ -26,7 +26,7 @@
  - ~~Start on data viz, look at section below for charts needed~~ :white_check_mark:
  - ~~Fix UpdateView in recipes~~ :white_check_mark:
  - ~~Order ingredient properly for recipe database~~ :white_check_mark:
- - Add filters for recipes in search
+ - ~~Add filters for recipes in search~~ :white_check_mark:
  - Make sure instructions are also ordered vertically like ingredients
 
  - Style website that looks acceptable and not from 2006
