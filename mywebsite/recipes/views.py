@@ -13,17 +13,35 @@ from django.views.generic import (
 class RecipeListView(ListView):
     template_name = "recipe_home.html"
     queryset = recipesModel.objects.all()
-    context_object_name = 'all_search_results'
+    context_object_name = 'filtered_results'
     
     def get_queryset(self):
-       result = super(RecipeListView, self).get_queryset()
-       query = self.request.GET.get('q')
-       if query:
-          postresult = recipesModel.objects.filter(title__icontains=query)
-          result = postresult
-       else:
-           result = recipesModel.objects.all()
-       return result
+        result = None
+
+        text_query = self.request.GET.get('text-filter')
+        category_query = self.request.GET.get('category-filter')
+        
+        if text_query == None:
+            return recipesModel.objects.all()  
+        
+        if text_query != '' or category_query != "None":
+        
+            if text_query == "" and category_query == "None":
+                return result
+            elif text_query != "" and category_query == "None":
+                postresult = recipesModel.objects.filter(title__icontains=text_query)
+                result = postresult
+            elif text_query == "" and category_query != "None":
+                print("here")
+                postresult = recipesModel.objects.filter(meal_type__iexact=category_query)
+                result=postresult
+            elif text_query != "" and category_query != "None":
+                postresult = recipesModel.objects.filter(title__icontains=text_query, meal_type__iexact=category_query)
+                result=postresult
+        else:
+            result = recipesModel.objects.all()    
+    
+        return result
     
 class RecipeDetailView(DetailView):
     template_name = "recipe_detail.html"

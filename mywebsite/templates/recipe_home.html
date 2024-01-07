@@ -6,24 +6,38 @@
 
 {% block body_content %}
 
-<form>
-    <input type="text" name="q">
-    <button>Search</button>
-</form>
+<div name="filter">
+
+    <form>
+        <div class="filters">
+          <label for="food-category" class="form-label">Filter Recipe by Title:</label>
+          <input type="text" name="text-filter">
+        </div>
+    
+    <label for="food-type">Filter by Category:</label>
+        <select name="category-filter">
+            <option value="None">Choose One</option>
+            <option value="BREAKFAST">Breakfast</option>
+            <option value="LUNCH">Lunch</option>
+            <option value="DINNER">Dinner</option>
+            <option value="DESSERT">Dessert</option>
+            <option value="APPETIZER">Appetizer</option>
+        </select>
+        <div name="filter-button">
+        <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </form>
+</div>
 
 <a name="add-new-recipe" href="{% url 'recipes:add_recipe'%}">Add Recipe</a>
 
-{% block detail_view %}
-{% endblock detail_view %}
 
-{% block search_view %}
-{% endblock search_view %}
 
-    {% if not all_search_results %}
+    {% if not filtered_results %}
 <h5>No recipes found. I guess you will go hungry :(</h5>
     {% endif %}
 
-{% for recipe in all_search_results %}
+{% for recipe in filtered_results %}
     <h5><a href="{% url 'recipes:recipe_detail' recipe.id %}">{{ recipe.title }}</a></h5>
 {% endfor %}
 
