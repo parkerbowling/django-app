@@ -314,8 +314,8 @@ def expense_comparison_barchart(request):
     except ValueError:
         print("no income reported")
     
-    #gets the date input from the user (STILL NEED THIS TO BE AUTOMATICALLY CHANGED ON FILTER CHANGE)
-    fromDate = request.session.get("date")
+    #gets the date input from the user
+    fromDate = request.session.get("date") #on first start this has no value, need to chaange this to a try statement
     fromDate = fromDate.split("-")
     fromYear = fromDate[0].strip('"')
     fromMonth = fromDate[1]
