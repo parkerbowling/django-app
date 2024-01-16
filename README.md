@@ -10,12 +10,15 @@
        PostgreSQL database.
     5. Also make sure that settings.py NAME for the database matches what the name of the 
        database you created in PostgreSQL.
-    6. run python3 manage.py runserver to run the server.
+    6. You will probably need to run `python3 manage.py makemigrations` and/or `python3 manage.py migrate` to make sure the server matches the code
+        - If you are getting an error that "expenses..." doesn't exist, comment out the helper.py file and rerun the migrate commands
+    7. run python3 manage.py runserver to run the server, make sure the postgres server is also running
 
 ## Plan For Website
 
 ### Phase 3
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
+ - Can we have the parts of the chart be clickable? Click a section of the chart and it pulls up those expenses for that. [Check this out](https://stackoverflow.com/questions/20964443/highcharts-making-a-point-clickable)
  - Web scrape: user enters a URL of a recipe and it automatically gets scraped off and inserted into the database
  - Fix Update recipe date bug
  - Style website that looks acceptable and not from 2006
@@ -36,14 +39,6 @@
     1. ~~Expense Tracker~~ :white_check_mark:
     2. ~~Recipes Database~~ :white_check_mark:
 
- - #### Data Viz Needs
-    - ~~since I include income, show savings over expenses for that month~~ :white_check_mark:
-    - ~~Month versus month comparison~~ :white_check_mark:
-    - add types of charts to choose from (bar, line graph, pie chart)
-    - Year over Year comparison (eventually) 
-    - Add a credit card percentage calculator -> based on what cashback you get for each card, calculate the average percent return over all expenses
-    - *Note*: not sure if the credit card chart would really be useful
-
 #### Feature Wishlist
 
 - Expense Tracker
@@ -51,6 +46,7 @@
     2. Add a budget feature that gives goals on what you want to spend that month
     3. Wrap the database around an A.I. (LLM) that can compute any data viz you ask it for
     4. *It would be really cool to build this dynamically, so when a user first launches the website, they can choose what categories they want, and also add or remove categories as needed (This would be more like an app that can save data)*
+    5. "ChartGPT" - build or connect and LLM that allows you to ask it any question about your data and enable it to give you a visualization about it.
 
 - Receipes Database
     1. Select a recipe (or many) and compile a grocery list from those recipe(s) selected
