@@ -1,0 +1,42 @@
+{% extends 'expense_home.html' %}
+<html>
+{% block pie_chart %}
+<head>
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+  <div id="pie-chart-container"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var chartData = {{ chart_data|safe }};
+      var chartTitle = {{ chart-Title|safe }}
+
+      Highcharts.chart('chart-container', {
+        chart: {
+            type: pie, 
+            renderTo:expenses-pie-container
+        },
+        title: {text: chartTitle},
+        allowPointSelect: true,
+        tooltip: {
+            format: 
+                {series.name}: <b>${y}</b><br/>,
+                shared:true
+        },
+        series: [{
+          data: chartData,
+          point: {
+            events: {
+              click: function() {
+                // Open modal here using JavaScript
+              }
+            }
+          }
+        }]
+      });
+    });
+  </script>
+</body>
+{% endblock pie_chart %}
+</html>
