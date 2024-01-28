@@ -45,6 +45,7 @@ class expenseReportForm(forms.ModelForm):
     HEALTHCARE = 'HEALTHCARE'
     GIVING = 'GIVING'
     SELF_CARE = 'SELF_CARE'
+    INVESTING = 'INVESTING'
     MISCELLANEOUS = 'MISCELLANEOUS'
 
     #choices for the user. the first item is what the machine sees, the second is what the user sees
@@ -63,6 +64,7 @@ class expenseReportForm(forms.ModelForm):
         (HEALTHCARE, 'Healthcare'),    
         (GIVING, 'Giving'),
         (SELF_CARE, 'Self Care'),
+        (INVESTING, 'Investing'),
         (MISCELLANEOUS, 'Miscellaneous')
     )
     

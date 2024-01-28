@@ -17,6 +17,7 @@ class expenseReport(models.Model):
     HEALTHCARE = 'HEALTHCARE'
     GIVING = 'GIVING'
     SELF_CARE = 'SELF_CARE'
+    INVESTING = 'INVESTING'
     MISCELLANEOUS = 'MISCELLANEOUS'
 
     EXPENSE_CHOICES = (
@@ -34,6 +35,7 @@ class expenseReport(models.Model):
         (HEALTHCARE, 'Healthcare'),    
         (GIVING,'Giving'),
         (SELF_CARE,'Self Care'),
+        (INVESTING,'Investing'),
         (MISCELLANEOUS, 'Miscellaneous')
     )
     

@@ -70,7 +70,9 @@ def add_expense(request):
         "form":form
     }
     return render(request, 'add_expense.html', context)
-
+#
+# Pie Chart
+#
 def expense_piechart(request):
     
     #dynamically get the Categories in case I decide to add or remove one of them and make them unique
@@ -83,7 +85,7 @@ def expense_piechart(request):
     #name a json structure for inserting data into chart
     allCategoryData = {
         "name": "Expenses",
-        "data": []
+        "data": [],
     }
     
     #for every category (remember not all categories may have appeared yet) sum the values and add to data
@@ -137,6 +139,7 @@ def expense_piechart(request):
             'renderTo':'expenses-pie-container'
         },
         'title': {'text': chartTitle},
+        'allowPointSelect': 'true',
         'tooltip': {
             'format': 
                 '{series.name}: <b>${y}</b><br/>',
@@ -148,6 +151,9 @@ def expense_piechart(request):
     #return a JsonResponse so Highchart knows what to do with our data
     return JsonResponse(chart)
 
+#
+# Sankey Chart
+#
 def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
