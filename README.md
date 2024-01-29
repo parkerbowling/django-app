@@ -17,6 +17,8 @@
 ## Plan For Website
 
 ### Phase 3
+ - Fix the mouse-over part on the pie chart. Doesn't need to say "Expenses: $" only the dollar amount
+ - Add "Sum or Combine" button on the comparison chart, where you can click it and instead of comparing the months, it adds them together to see total amount saved over that span
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
  - Can we have the parts of the chart be clickable? Click a section of the chart and it pulls up those expenses for that. [Check this out](https://stackoverflow.com/questions/20964443/highcharts-making-a-point-clickable)
  - Web scrape: user enters a URL of a recipe and it automatically gets scraped off and inserted into the database
