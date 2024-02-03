@@ -16,19 +16,177 @@
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script>
-            $.ajax({
-            url: $("#expenses-pie-container").attr("data-url"),
-            dataType: 'json',
-            success: function (data) {
-                Highcharts.chart("expenses-pie-container", data);
-            }
+            {% comment %} document.addEventListener('DOMContentLoaded', function() {
+              // Fetch pie chart data from the server
+              fetch('/pie-chart-data/')
+                .then(response => response.json())
+                .then(responseData => {
+                    const chartTitle = responseData.title;
+                    const data = responseData.data;
+                  // Render the pie chart with the retrieved data
+                  Highcharts.chart('expenses-pie-container', {
+                    chart: {
+                      type: 'pie'
+                    },
+                    title: {
+                        text: chartTitle  // Set the chart title dynamically
+                      }, 
+                    allowPointSelect: true,
+                    tooltip: {
+                        pointFormatter: function() {
+                            return `<span style="color:${this.color}">\u25CF</span> $<b>${Highcharts.numberFormat(this.y, 2, '.', ',')}</b>`;
+                        }
+                    },
+                    series: [{
+                      data: data.map(item => ({
+                        name: item.name,
+                        y: item.y,
+                        events: {
+                          click: function () {
+                            renderModalChart1(item.name, item.value);
+                          }
+                        }
+                      }))
+                    }]
+                  });
+                });
             });
-        </script>
+                // Render modal chart 1
+            function renderModalChart1(name,value) {
+                Highcharts.chart('modalChart1Container', {
+                    series: [{
+                        data: chart1Data
+                    }]
+                });
+            } {% endcomment %}
+        </script> 
+
+        {% comment %} new code now{% endcomment%}
+
+        <style>
+            /* CSS for the modal */
+            .modal {
+              display: none;
+              position: fixed;
+              z-index: 1;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              overflow: auto;
+              background-color: rgba(0, 0, 0, 0.4);
+            }
+            .modal-content {
+              background-color: #fefefe;
+              margin: 15% auto;
+              padding: 20px;
+              border: 1px solid #888;
+              width: 80%;
+            }
+            .close {
+              color: #aaaaaa;
+              float: right;
+              font-size: 28px;
+              font-weight: bold;
+              cursor: pointer;
+            }
+            .close:hover,
+            .close:focus {
+              color: #000;
+              text-decoration: none;
+              cursor: pointer;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="chartContainer" style="height: 300px;"></div>
+        
+          <!-- Modal -->
+          <div id="modal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <div id="modalContent"></div>
+            </div>
+          </div>
+        
+          <script>
+            // Function to fetch data for the entire pie chart
+            async function fetchPieChartData() {
+                try {
+                    const response = await fetch('/pie-chart-data/'); // Replace with your endpoint
+                    const data = await response.json();
+                    
+                    return data;
+                  } catch (error) {
+                    console.error('Error fetching pie chart data:', error);
+                  }
+            }
+        
+            // Function to fetch data for a specific category when clicked
+            async function fetchCategoryData(category) {
+              // ... (fetch code for category data)
+            }
+        
+            // Render the pie chart with dynamic data fetched from the first fetch call
+            async function renderChart() {
+              const pieChartData = await fetchPieChartData();
+                
+              const chartTitle = pieChartData.title; // Extracting the title
+              const seriesData = pieChartData.data;
+
+    
+              console.log(seriesData)
+
+              Highcharts.chart('expenses-pie-container', {
+                chart: {
+                    type: 'pie'
+                  },
+                  title: {
+                      text: chartTitle // Set the chart title dynamically
+                    }, 
+                  allowPointSelect: true,
+                  tooltip: {
+                      pointFormatter: function() {
+                          return `<span style="color:${this.color}">\u25CF</span> $<b>${Highcharts.numberFormat(this.y, 2, '.', ',')}</b>`;
+                      }
+                  },
+                series: [{
+                    
+                  data: seriesData
+                }],
+                plotOptions: {
+                  series: {
+                    point: {
+                      events: {
+                        click: async function () {
+                          // Display the modal with data for the clicked category
+                          const clickedCategory = this.name;
+                          const categoryData = await fetchCategoryData(clickedCategory);
+                          const modalContent = document.getElementById('modalContent');
+                          modalContent.innerHTML = `<h2>${clickedCategory}</h2><p>${JSON.stringify(categoryData)}</p>`;
+                          document.getElementById('modal').style.display = 'block';
+                        }
+                      }
+                    }
+                  }
+                }
+              });
+            }
+        
+            // Call the renderChart function to render the chart
+            renderChart();
+        
+            // Close the modal when the close button is clicked
+            const closeBtn = document.querySelector('.close');
+            closeBtn.onclick = function() {
+              document.getElementById('modal').style.display = "none";
+            }
+          </script>
+
+        {% comment %}
     </div> 
     <div class="column" name="sankey-chart" display="inline">
         <div id="expenses-sankey-container" data-url="{% url 'expenses:expense_sankeychart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-        <script src="https://code.highcharts.com/highcharts.src.js"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="https://code.highcharts.com/modules/sankey.js"></script>
         <script>
             $.ajax({
@@ -87,6 +245,7 @@
                 });
             </script>
     </div>
+            {% endcomment %}
 </div>
 </div>
 {% endblock body_content %}

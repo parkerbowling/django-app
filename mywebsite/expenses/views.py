@@ -70,12 +70,12 @@ def add_expense(request):
         "form":form
     }
     return render(request, 'add_expense.html', context)
-#
-# Pie Chart
-#
-def expense_piechart(request):
-    
-    #dynamically get the Categories in case I decide to add or remove one of them and make them unique
+
+def pie_chart_category_data(request):
+    pass
+
+def pie_chart_data(request):
+        #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     newSet = []
     newSet = h.getExpenseCategories()
     try:
@@ -84,15 +84,19 @@ def expense_piechart(request):
         print("no income reported")
     #name a json structure for inserting data into chart
     allCategoryData = {
-        "name": "Expenses",
+        "title": "",
         "data": [],
     }
+    
+    dataForAll = []
     
     #for every category (remember not all categories may have appeared yet) sum the values and add to data
     #will need to be able to filter on certain dates, like months and years
     dateNow = datetime.now()
     currentYear = dateNow.year
-    currentMonth = dateNow.month
+    currentMonth = dateNow.month-1
+    
+    allCategoryData["title"] = f"Expenses for {currentMonth}/{currentYear}"
     
     for i in newSet:
         
@@ -105,14 +109,6 @@ def expense_piechart(request):
                         expenseChoices=str(i)).aggregate(
                     Sum('value'))['value__sum']
                         
-        # will need an else statement if user wants to see lifetime expenses (all)
-        # else:
-        #
-        #     categorySum = expenseReport.objects.values("value"
-        #             ).filter(
-        #                 expenseChoices=str(i)).aggregate(
-        #             Sum('value'))['value__sum']
-            
         #if there is no data, no need to add to chart     
         if categorySum == None:
             continue
@@ -121,35 +117,94 @@ def expense_piechart(request):
             'name':str(i),
             'y': float(categorySum)
         }
+        
+        dataForAll.append(int(categorySum))
+
         allCategoryData['data'].append(data)
+    print(allCategoryData)
+    print(dataForAll)        
+    return JsonResponse(allCategoryData, safe=False)
+
+#
+# Pie Chart
+#
+def expense_piechart(request):
+    pie_chart_data(request)
+    #dynamically get the Categories in case I decide to add or remove one of them and make them unique
+    # newSet = []
+    # newSet = h.getExpenseCategories()
+    # try:
+    #     newSet.remove("INCOME")
+    # except ValueError:
+    #     print("no income reported")
+    # #name a json structure for inserting data into chart
+    # allCategoryData = {
+    #     "name": "Expenses",
+    #     "data": [],
+    # }
+    
+    # #for every category (remember not all categories may have appeared yet) sum the values and add to data
+    # #will need to be able to filter on certain dates, like months and years
+    # dateNow = datetime.now()
+    # currentYear = dateNow.year
+    # currentMonth = dateNow.month
+    
+    # for i in newSet:
         
-    #depending on selection, change this
-    chartTitle = ""
-    if True:
-        chartTitle = f"Total Expenses This Month {currentMonth}/{currentYear}"
-    # else:
-    #     chartTitle = "Total Expenses All"
+    #     #gets all values for category and sums
+    #     if True:
+    #         categorySum = expenseReport.objects.values("value"
+    #                 ).filter(
+    #                     date__year=currentYear, date__month=currentMonth
+    #                 ).filter(
+    #                     expenseChoices=str(i)).aggregate(
+    #                 Sum('value'))['value__sum']
+                        
+    #     # will need an else statement if user wants to see lifetime expenses (all)
+    #     # else:
+    #     #
+    #     #     categorySum = expenseReport.objects.values("value"
+    #     #             ).filter(
+    #     #                 expenseChoices=str(i)).aggregate(
+    #     #             Sum('value'))['value__sum']
+            
+    #     #if there is no data, no need to add to chart     
+    #     if categorySum == None:
+    #         continue
+
+    #     data = {
+    #         'name':str(i),
+    #         'y': float(categorySum)
+    #     }
+    #     allCategoryData['data'].append(data)
         
-    #json chart configuration
-    chart = {
-        'chart': {
-            'type': 'pie', 
-            # 'height': 300,
-            # 'width': 1000,
-            'renderTo':'expenses-pie-container'
-        },
-        'title': {'text': chartTitle},
-        'allowPointSelect': 'true',
-        'tooltip': {
-            'format': 
-                '{series.name}: <b>${y}</b><br/>',
-                'shared':'true'
-        },
-        'series': [allCategoryData]
-    }
+    # #depending on selection, change this
+    # chartTitle = ""
+    # if True:
+    #     chartTitle = f"Total Expenses This Month {currentMonth}/{currentYear}"
+    # # else:
+    # #     chartTitle = "Total Expenses All"
+        
+    # #json chart configuration
+    # chart = {
+    #     'chart': {
+    #         'type': 'pie', 
+    #         # 'height': 300,
+    #         # 'width': 1000,
+    #         'renderTo':'expenses-pie-container'
+    #     },
+    #     'title': {'text': chartTitle},
+    #     'allowPointSelect': 'true',
+    #     'tooltip': {
+    #         'format': 
+    #             '{series.name}: <b>${y}</b><br/>',
+    #             'shared':'true'
+    #     },
+    #     'series': [allCategoryData]
+    # }
     
     #return a JsonResponse so Highchart knows what to do with our data
-    return JsonResponse(chart)
+    return
 
 #
 # Sankey Chart

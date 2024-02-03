@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 # importing from app folder, the view file
-from expenses.views import home
+from expenses.views import home, pie_chart_data, pie_chart_category_data
 from auth_users.views import login_user
 
 urlpatterns = [
@@ -34,6 +34,8 @@ urlpatterns = [
 
     #name expenses urls by including expenses namespace
     path('expenses/',include('expenses.urls',namespace='expenses')),
+    path('pie-chart-data/',pie_chart_data,name='pie-chart-data'),
+    path('pie-chart-category-data/<str:category>/',pie_chart_category_data,name='pie-chart-category-data'),
     
     #name expenses urls by including recipes namespace
     path('recipes/',include('recipes.urls',namespace='recipes')),

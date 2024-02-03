@@ -11,4 +11,5 @@ urlpatterns = [
     path('pie-chart/',views.expense_piechart, name='expense_piechart'),
     path('sankey-chart/',views.expense_sankeychart,name='expense_sankeychart'),
     path('comparison-chart/',views.expense_comparison_barchart,name='expense_comparison_barchart'),
+    #path('expenses/pie_chart_data/', views.pie_chart_data,name='pie_chart_data'),
 ]
