@@ -125,7 +125,58 @@
             // Function to fetch data for a specific category when clicked
             async function fetchCategoryData(category) {
               // ... (fetch code for category data)
+              try {
+                const response = await fetch('/pie-chart-category-data/' + category + '/'); // Replace with your endpoint
+                const data = await response.json();
+                console.log(data);
+                displayCategoryDataInModal(category, data);
+              } catch (error) {
+                console.error('Error fetching pie chart data:', error);
+              }
             }
+
+            function displayCategoryDataInModal(category, data) {
+                const modalContent = document.getElementById('modalContent');
+                
+                // Clear any existing content in the modal content
+                modalContent.innerHTML = '';
+              
+                // Create a heading to display the category title
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = `Category: ${category}`;
+                modalContent.appendChild(categoryTitle);
+              
+                // Iterate through the data and create HTML elements for each name-value pair
+                data.forEach(dataPoint => {
+                  const date = dataPoint.date;
+                  const name = dataPoint.title;
+                  const value = dataPoint.value;
+              
+                  // Create a paragraph element to display the name and value
+                  const dataPointElement = document.createElement('p');
+                  dataPointElement.textContent = `${date} - ${name}: $${value}`;
+              
+                  // Append the paragraph element to the modal content
+                  modalContent.appendChild(dataPointElement);
+                });
+              
+                // Display the modal
+                const modal = document.getElementById('modal');
+                modal.style.display = 'block';
+              
+                // Close the modal when the close button is clicked
+                const closeBtn = document.querySelector('.close');
+                closeBtn.onclick = function() {
+                  modal.style.display = 'none';
+                };
+              
+                // Close the modal when the user clicks outside of it
+                window.onclick = function(event) {
+                  if (event.target == modal) {
+                    modal.style.display = 'none';
+                  }
+                };
+              }
         
             // Render the pie chart with dynamic data fetched from the first fetch call
             async function renderChart() {
@@ -162,9 +213,7 @@
                           // Display the modal with data for the clicked category
                           const clickedCategory = this.name;
                           const categoryData = await fetchCategoryData(clickedCategory);
-                          const modalContent = document.getElementById('modalContent');
-                          modalContent.innerHTML = `<h2>${clickedCategory}</h2><p>${JSON.stringify(categoryData)}</p>`;
-                          document.getElementById('modal').style.display = 'block';
+
                         }
                       }
                     }
@@ -177,10 +226,10 @@
             renderChart();
         
             // Close the modal when the close button is clicked
-            const closeBtn = document.querySelector('.close');
+            {% comment %} const closeBtn = document.querySelector('.close');
             closeBtn.onclick = function() {
               document.getElementById('modal').style.display = "none";
-            }
+            } {% endcomment %}
           </script>
 
         {% comment %}

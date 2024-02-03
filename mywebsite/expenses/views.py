@@ -71,8 +71,22 @@ def add_expense(request):
     }
     return render(request, 'add_expense.html', context)
 
-def pie_chart_category_data(request):
-    pass
+def pie_chart_category_data(request, category):
+    print(category)
+    
+    dateNow = datetime.now()
+    currentYear = dateNow.year
+    currentMonth = dateNow.month-1
+    
+    categorySum = expenseReport.objects.values("date","title","value"
+                    ).filter(
+                        date__year=currentYear, date__month=currentMonth
+                    ).filter(
+                        expenseChoices=str(category))
+                    
+    return JsonResponse(list(categorySum), safe=False)
+
+
 
 def pie_chart_data(request):
         #dynamically get the Categories in case I decide to add or remove one of them and make them unique
