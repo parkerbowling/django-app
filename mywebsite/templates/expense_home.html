@@ -195,7 +195,7 @@
         </script>
     </div>
 <div class="row1">
-    <div class="column" name="comparison-chart" display="inline">
+    <div class="column" name="expense_comparison_barchart" display="inline">
         <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
             {% csrf_token %}
             {{ form.as_p }}
@@ -211,12 +211,12 @@
             $(document).on('submit','#filterComparison', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "comparison-chart/",
+                    url: "expense_comparison_barchart/",
                     type: "POST",
                     data: {
                          date: $("#id_date").val(),
                          toDate: $("#id_toDate").val(),
-                         expenseLabelCategory: $("#id_expenseLabelCategory").val(),
+                         expenseLabelCategory: $("#id_filterComparison").val(),
                          checkbox: $("#checkbox").val()
                     },
                     success: function(json) {
