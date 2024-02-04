@@ -211,7 +211,7 @@
             $(document).on('submit','#filterComparison', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "sankey-chart/",
+                    url: "comparison-chart/",
                     type: "POST",
                     data: {
                          date: $("#id_date").val(),
