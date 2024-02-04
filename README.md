@@ -17,6 +17,7 @@
 ## Plan For Website
 
 ### Phase 3
+ - "GAS_REPAIRS" still exists in the database but is no longer used, need to get rid of --> see the choices on the comparison chart
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
  - Can we have the parts of the chart be clickable? Click a section of the chart and it pulls up those expenses for that. [Check this out](https://stackoverflow.com/questions/20964443/highcharts-making-a-point-clickable)
  - Web scrape: user enters a URL of a recipe and it automatically gets scraped off and inserted into the database
