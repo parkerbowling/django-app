@@ -76,7 +76,7 @@ def pie_chart_category_data(request, category):
     
     dateNow = datetime.now()
     currentYear = dateNow.year
-    currentMonth = dateNow.month-1
+    currentMonth = dateNow.month
     
     categorySum = expenseReport.objects.values("date","title","value"
                     ).filter(
@@ -108,7 +108,7 @@ def pie_chart_data(request):
     #will need to be able to filter on certain dates, like months and years
     dateNow = datetime.now()
     currentYear = dateNow.year
-    currentMonth = dateNow.month-1
+    currentMonth = dateNow.month
     
     allCategoryData["title"] = f"Expenses for {currentMonth}/{currentYear}"
     
@@ -143,81 +143,6 @@ def pie_chart_data(request):
 # Pie Chart
 #
 def expense_piechart(request):
-    pie_chart_data(request)
-    #dynamically get the Categories in case I decide to add or remove one of them and make them unique
-    # newSet = []
-    # newSet = h.getExpenseCategories()
-    # try:
-    #     newSet.remove("INCOME")
-    # except ValueError:
-    #     print("no income reported")
-    # #name a json structure for inserting data into chart
-    # allCategoryData = {
-    #     "name": "Expenses",
-    #     "data": [],
-    # }
-    
-    # #for every category (remember not all categories may have appeared yet) sum the values and add to data
-    # #will need to be able to filter on certain dates, like months and years
-    # dateNow = datetime.now()
-    # currentYear = dateNow.year
-    # currentMonth = dateNow.month
-    
-    # for i in newSet:
-        
-    #     #gets all values for category and sums
-    #     if True:
-    #         categorySum = expenseReport.objects.values("value"
-    #                 ).filter(
-    #                     date__year=currentYear, date__month=currentMonth
-    #                 ).filter(
-    #                     expenseChoices=str(i)).aggregate(
-    #                 Sum('value'))['value__sum']
-                        
-    #     # will need an else statement if user wants to see lifetime expenses (all)
-    #     # else:
-    #     #
-    #     #     categorySum = expenseReport.objects.values("value"
-    #     #             ).filter(
-    #     #                 expenseChoices=str(i)).aggregate(
-    #     #             Sum('value'))['value__sum']
-            
-    #     #if there is no data, no need to add to chart     
-    #     if categorySum == None:
-    #         continue
-
-    #     data = {
-    #         'name':str(i),
-    #         'y': float(categorySum)
-    #     }
-    #     allCategoryData['data'].append(data)
-        
-    # #depending on selection, change this
-    # chartTitle = ""
-    # if True:
-    #     chartTitle = f"Total Expenses This Month {currentMonth}/{currentYear}"
-    # # else:
-    # #     chartTitle = "Total Expenses All"
-        
-    # #json chart configuration
-    # chart = {
-    #     'chart': {
-    #         'type': 'pie', 
-    #         # 'height': 300,
-    #         # 'width': 1000,
-    #         'renderTo':'expenses-pie-container'
-    #     },
-    #     'title': {'text': chartTitle},
-    #     'allowPointSelect': 'true',
-    #     'tooltip': {
-    #         'format': 
-    #             '{series.name}: <b>${y}</b><br/>',
-    #             'shared':'true'
-    #     },
-    #     'series': [allCategoryData]
-    # }
-    
-    #return a JsonResponse so Highchart knows what to do with our data
     return
 
 #
@@ -405,6 +330,10 @@ def expense_comparison_barchart(request):
     
     #get category
     filterCategory = request.session.get("expenseLabelCategory")
+    
+    #check checkbox value
+    checkbox = request.session.get("checkbox")
+    print(checkbox)
     
     #title
     chartTitle = "Comparison Chart"

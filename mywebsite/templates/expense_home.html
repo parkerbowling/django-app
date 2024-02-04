@@ -15,53 +15,6 @@
         <div id="expenses-pie-container" data-url="{% url 'expenses:expense_piechart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script>
-            {% comment %} document.addEventListener('DOMContentLoaded', function() {
-              // Fetch pie chart data from the server
-              fetch('/pie-chart-data/')
-                .then(response => response.json())
-                .then(responseData => {
-                    const chartTitle = responseData.title;
-                    const data = responseData.data;
-                  // Render the pie chart with the retrieved data
-                  Highcharts.chart('expenses-pie-container', {
-                    chart: {
-                      type: 'pie'
-                    },
-                    title: {
-                        text: chartTitle  // Set the chart title dynamically
-                      }, 
-                    allowPointSelect: true,
-                    tooltip: {
-                        pointFormatter: function() {
-                            return `<span style="color:${this.color}">\u25CF</span> $<b>${Highcharts.numberFormat(this.y, 2, '.', ',')}</b>`;
-                        }
-                    },
-                    series: [{
-                      data: data.map(item => ({
-                        name: item.name,
-                        y: item.y,
-                        events: {
-                          click: function () {
-                            renderModalChart1(item.name, item.value);
-                          }
-                        }
-                      }))
-                    }]
-                  });
-                });
-            });
-                // Render modal chart 1
-            function renderModalChart1(name,value) {
-                Highcharts.chart('modalChart1Container', {
-                    series: [{
-                        data: chart1Data
-                    }]
-                });
-            } {% endcomment %}
-        </script> 
-
-        {% comment %} new code now{% endcomment%}
 
         <style>
             /* CSS for the modal */
@@ -225,14 +178,8 @@
             // Call the renderChart function to render the chart
             renderChart();
         
-            // Close the modal when the close button is clicked
-            {% comment %} const closeBtn = document.querySelector('.close');
-            closeBtn.onclick = function() {
-              document.getElementById('modal').style.display = "none";
-            } {% endcomment %}
           </script>
 
-        {% comment %}
     </div> 
     <div class="column" name="sankey-chart" display="inline">
         <div id="expenses-sankey-container" data-url="{% url 'expenses:expense_sankeychart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -264,26 +211,24 @@
             $(document).on('submit','#filterComparison', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "expense_home/",
+                    url: "sankey-chart/",
                     type: "POST",
                     data: {
-                         date: $("id_date").val(),
-                         toDate: $("id_toDate").val(),
-                         expenseLabelCategory: $("id_expenseLabelCategory").val(),
-                        }
-                    success : function(json) {
+                         date: $("#id_date").val(),
+                         toDate: $("#id_toDate").val(),
+                         expenseLabelCategory: $("#id_expenseLabelCategory").val(),
+                         checkbox: $("#checkbox").val()
+                    },
+                    success: function(json) {
                             //$('#post-text').val(''); // remove the value from the input
                             console.log(json); // log the returned json to the console
                             console.log("success"); // another sanity check
-                        },
+                    },
                 })
             })
         </script>
 
         <div id="expenses-comparison-container" data-url="{% url 'expenses:expense_comparison_barchart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            <script src="https://code.highcharts.com/highcharts.src.js"></script>
-            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-            <script src="https://code.highcharts.com/modules/sankey.js"></script>
             <script>
                 $.ajax({
                 url: $("#expenses-comparison-container").attr("data-url"),
@@ -294,7 +239,7 @@
                 });
             </script>
     </div>
-            {% endcomment %}
+
 </div>
 </div>
 {% endblock body_content %}
