@@ -196,9 +196,6 @@
     </div>
 <div class="row1">
     <div class="column" name="expense_comparison_barchart" display="inline">
-
-      {% comment %} New expense comparison code {% endcomment %}
-
         <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
             {% csrf_token %}
             {{ form.as_p }}
@@ -273,12 +270,11 @@
         async function fetchCategoryComparisonData(category,date) {
           // ... (fetch code for category data)
           try {
-            if (category == "Average") {
+            if (category == "Average" || category == "Savings") {
               return
             }
             const response = await fetch('/comparison-chart-category-data/' + category + '/' + date + '/'); // Replace with your endpoint
             const data = await response.json();
-            console.log(data)
             displayCategoryDataInComparisonModal(category, data);
           } catch (error) {
             console.error('Error fetching pie chart data:', error);
@@ -331,14 +327,10 @@
         // Render the pie chart with dynamic data fetched from the first fetch call
         async function renderChart() {
           const comparisonChartData = await fetchComparisonChartData();
-          //console.log(comparisonChartData);
+
           // Extracting the data
           const seriesData = comparisonChartData.series;
           const xLabels = comparisonChartData.categories;
-          console.log(xLabels);
-
-
-          //console.log(seriesData)
 
           Highcharts.chart('comparisonContainer', {
             chart: {
@@ -393,52 +385,6 @@
     
       </script>
 
-
-
-
-
-        {% comment %} <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="Save"/>
-            <ul class="messages">
-                {% for message in messages %}
-                <li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
-                {% endfor %}
-            </ul>
-        </form>
-
-        <script>
-            $(document).on('submit','#filterComparison', function(e) {
-                e.preventDefault();
-                $.ajax({
-                    url: "expense_comparison_barchart/",
-                    type: "POST",
-                    data: {
-                         date: $("#id_date").val(),
-                         toDate: $("#id_toDate").val(),
-                         expenseLabelCategory: $("#id_filterComparison").val(),
-                         checkbox: $("#checkbox").val()
-                    },
-                    success: function(json) {
-                            //$('#post-text').val(''); // remove the value from the input
-                            console.log(json); // log the returned json to the console
-                            console.log("success"); // another sanity check
-                    },
-                })
-            })
-        </script>
-
-        <div id="expenses-comparison-container" data-url="{% url 'expenses:expense_comparison_barchart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            <script>
-                $.ajax({
-                url: $("#expenses-comparison-container").attr("data-url"),
-                dataType: 'json',
-                success: function (data) {
-                    Highcharts.chart("expenses-comparison-container", data);
-                }
-                });
-            </script> {% endcomment %}
     </div>
 
 </div>
