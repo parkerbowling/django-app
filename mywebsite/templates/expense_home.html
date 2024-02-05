@@ -15,20 +15,174 @@
         <div id="expenses-pie-container" data-url="{% url 'expenses:expense_piechart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         <script src="https://code.highcharts.com/highcharts.src.js"></script>
         <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-        <script>
-            $.ajax({
-            url: $("#expenses-pie-container").attr("data-url"),
-            dataType: 'json',
-            success: function (data) {
-                Highcharts.chart("expenses-pie-container", data);
+
+        <style>
+            /* CSS for the modal */
+            .modal {
+              display: none;
+              position: fixed;
+              z-index: 1;
+              left: 0;
+              top: 0;
+              width: 100%;
+              height: 100%;
+              overflow: auto;
+              background-color: rgba(0, 0, 0, 0.4);
             }
-            });
-        </script>
+            .modal-content {
+              background-color: #fefefe;
+              margin: 15% auto;
+              padding: 20px;
+              border: 1px solid #888;
+              width: 80%;
+            }
+            .close {
+              color: #aaaaaa;
+              float: right;
+              font-size: 28px;
+              font-weight: bold;
+              cursor: pointer;
+            }
+            .close:hover,
+            .close:focus {
+              color: #000;
+              text-decoration: none;
+              cursor: pointer;
+            }
+          </style>
+        </head>
+        <body>
+          <div id="chartContainer" style="height: 300px;"></div>
+        
+          <!-- Modal -->
+          <div id="modal" class="modal">
+            <div class="modal-content">
+              <span class="close">&times;</span>
+              <div id="modalContent"></div>
+            </div>
+          </div>
+        
+          <script>
+            // Function to fetch data for the entire pie chart
+            async function fetchPieChartData() {
+                try {
+                    const response = await fetch('/pie-chart-data/'); // Replace with your endpoint
+                    const data = await response.json();
+                   // console.log(data)
+                    return data;
+                  } catch (error) {
+                    console.error('Error fetching pie chart data:', error);
+                  }
+            }
+        
+            // Function to fetch data for a specific category when clicked
+            async function fetchCategoryData(category) {
+              // ... (fetch code for category data)
+              try {
+                const response = await fetch('/pie-chart-category-data/' + category + '/'); // Replace with your endpoint
+                const data = await response.json();
+                console.log("does this work for both");
+                console.log(data)
+                displayCategoryDataInModal(category, data);
+              } catch (error) {
+                console.error('Error fetching pie chart data:', error);
+              }
+            }
+
+            function displayCategoryDataInModal(category, data) {
+                const modalContent = document.getElementById('modalContent');
+                
+                // Clear any existing content in the modal content
+                modalContent.innerHTML = '';
+              
+                // Create a heading to display the category title
+                const categoryTitle = document.createElement('h2');
+                categoryTitle.textContent = `Category: ${category}`;
+                modalContent.appendChild(categoryTitle);
+              
+                // Iterate through the data and create HTML elements for each name-value pair
+                data.forEach(dataPoint => {
+                  const date = dataPoint.date;
+                  const name = dataPoint.title;
+                  const value = dataPoint.value;
+              
+                  // Create a paragraph element to display the name and value
+                  const dataPointElement = document.createElement('p');
+                  dataPointElement.textContent = `${date} - ${name}: $${value}`;
+              
+                  // Append the paragraph element to the modal content
+                  modalContent.appendChild(dataPointElement);
+                });
+              
+                // Display the modal
+                const modal = document.getElementById('modal');
+                modal.style.display = 'block';
+              
+                // Close the modal when the close button is clicked
+                const closeBtn = document.querySelector('.close');
+                closeBtn.onclick = function() {
+                  modal.style.display = 'none';
+                };
+              
+                // Close the modal when the user clicks outside of it
+                window.onclick = function(event) {
+                  if (event.target == modal) {
+                    modal.style.display = 'none';
+                  }
+                };
+              }
+        
+            // Render the pie chart with dynamic data fetched from the first fetch call
+            async function renderChart() {
+              const pieChartData = await fetchPieChartData();
+                
+              const chartTitle = pieChartData.title; // Extracting the title
+              const seriesData = pieChartData.data;
+    
+              console.log(seriesData)
+
+              Highcharts.chart('expenses-pie-container', {
+                chart: {
+                    type: 'pie'
+                  },
+                  title: {
+                      text: chartTitle // Set the chart title dynamically
+                    }, 
+                  allowPointSelect: true,
+                  tooltip: {
+                      pointFormatter: function() {
+                          return `<span style="color:${this.color}">\u25CF</span> $<b>${Highcharts.numberFormat(this.y, 2, '.', ',')}</b>`;
+                      }
+                  },
+                series: [{
+                    
+                  data: seriesData
+                }],
+                plotOptions: {
+                  series: {
+                    point: {
+                      events: {
+                        click: async function () {
+                          // Display the modal with data for the clicked category
+                          const clickedCategory = this.name;
+                          const categoryData = await fetchCategoryData(clickedCategory);
+
+                        }
+                      }
+                    }
+                  }
+                }
+              });
+            }
+        
+            // Call the renderChart function to render the chart
+            renderChart();
+        
+          </script>
+
     </div> 
     <div class="column" name="sankey-chart" display="inline">
         <div id="expenses-sankey-container" data-url="{% url 'expenses:expense_sankeychart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-        <script src="https://code.highcharts.com/highcharts.src.js"></script>
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <script src="https://code.highcharts.com/modules/sankey.js"></script>
         <script>
             $.ajax({
@@ -41,8 +195,209 @@
         </script>
     </div>
 <div class="row1">
-    <div class="column" name="comparison-chart" display="inline">
+    <div class="column" name="expense_comparison_barchart" display="inline">
+
+      {% comment %} New expense comparison code {% endcomment %}
+
         <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="Save"/>
+            <ul class="messages">
+                {% for message in messages %}
+                <li  {% if message.tags %} class=" {{ message.tags }} " {% endif %}> {{ message }} </li>
+                {% endfor %}
+            </ul>
+        </form>
+
+      <style>
+        /* CSS for the modal */
+        .modal {
+          display: none;
+          position: fixed;
+          z-index: 1;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          overflow: auto;
+          background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+          background-color: #fefefe;
+          margin: 15% auto;
+          padding: 20px;
+          border: 1px solid #888;
+          width: 80%;
+        }
+        .close {
+          color: #aaaaaa;
+          float: right;
+          font-size: 28px;
+          font-weight: bold;
+          cursor: pointer;
+        }
+        .close:hover,
+        .close:focus {
+          color: #000;
+          text-decoration: none;
+          cursor: pointer;
+        }
+      </style>
+    </head>
+    <body>
+      <div id="comparisonContainer" style="height: 300px;"></div>
+    
+      <!-- Modal -->
+      <div id="modalComparison" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div id="modalComparisonContent"></div>
+        </div>
+      </div>
+    
+      <script>
+        // Function to fetch data for the entire pie chart
+        async function fetchComparisonChartData() {
+          try {
+                const response = await fetch('/expense-comparison-barchart/'); // Replace with your endpoint
+                const data = await response.json();
+
+                return data;
+              } catch (error) {
+                console.error('Error fetching pie chart data:', error);
+              }
+        }
+    
+        // Function to fetch data for a specific category when clicked
+        async function fetchCategoryComparisonData(category,date) {
+          // ... (fetch code for category data)
+          try {
+            if (category == "Average") {
+              return
+            }
+            const response = await fetch('/comparison-chart-category-data/' + category + '/' + date + '/'); // Replace with your endpoint
+            const data = await response.json();
+            console.log(data)
+            displayCategoryDataInComparisonModal(category, data);
+          } catch (error) {
+            console.error('Error fetching pie chart data:', error);
+          }
+        } 
+
+        function displayCategoryDataInComparisonModal(category, data) {
+            const modalContent = document.getElementById('modalComparisonContent');
+            
+            // Clear any existing content in the modal content
+            modalContent.innerHTML = '';
+          
+            // Create a heading to display the category title
+            const categoryTitle = document.createElement('h2');
+            categoryTitle.textContent = `Category: ${category}`;
+            modalContent.appendChild(categoryTitle);
+          
+            // Iterate through the data and create HTML elements for each name-value pair
+            data.forEach(dataPoint => {
+              const date = dataPoint.date;
+              const name = dataPoint.title;
+              const value = dataPoint.value;
+          
+              // Create a paragraph element to display the name and value
+              const dataPointElement = document.createElement('p');
+              dataPointElement.textContent = `${date} - ${name}: $${value}`;
+          
+              // Append the paragraph element to the modal content
+              modalContent.appendChild(dataPointElement);
+            });
+          
+            // Display the modal
+            const modal = document.getElementById('modalComparison');
+            modal.style.display = 'block';
+          
+            // Close the modal when the close button is clicked
+            const closeBtn = document.querySelector('.close');
+            closeBtn.onclick = function() {
+              modal.style.display = 'none';
+            };
+          
+            // Close the modal when the user clicks outside of it
+            window.onclick = function(event) {
+              if (event.target == modal) {
+                modal.style.display = 'none';
+              }
+            };
+          }
+    
+        // Render the pie chart with dynamic data fetched from the first fetch call
+        async function renderChart() {
+          const comparisonChartData = await fetchComparisonChartData();
+          //console.log(comparisonChartData);
+          // Extracting the data
+          const seriesData = comparisonChartData.series;
+          const xLabels = comparisonChartData.categories;
+          console.log(xLabels);
+
+
+          //console.log(seriesData)
+
+          Highcharts.chart('comparisonContainer', {
+            chart: {
+                type: 'column',
+                renderTo: 'expenses-comparison-container', 
+              },
+              title: {
+                  text: "Comparison Chart" // Set the chart title dynamically
+                }, 
+              xAxis: {
+                  categories: xLabels,
+              },
+              yAxis: {
+                  min: 0,
+                  title: {
+                      text: 'Dollars'
+                  }
+              },
+              tooltip: {
+                headerFormat: null,
+                valueSuffix:'Dollars',
+                pointFormat:
+                    '{series.name}: ${point.y:.2f}',
+            },
+            series: seriesData
+            ,
+            plotOptions: {
+              column: {
+                  pointPadding: 0.2,
+                  borderWidth: 0
+              },
+              series: {
+                point: {
+                  events: {
+                    click: async function () {
+                      // Display the modal with data for the clicked category
+                      const clickedCategory = this.series.name;
+                      const clickedDate = this.category;
+                      console.log(this.category);
+                      const categoryData = await fetchCategoryComparisonData(clickedCategory,clickedDate);
+
+                    }
+                  }
+                }
+              }
+            }
+          });
+        }
+    
+        // Call the renderChart function to render the chart
+        renderChart();
+    
+      </script>
+
+
+
+
+
+        {% comment %} <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Save"/>
@@ -57,26 +412,24 @@
             $(document).on('submit','#filterComparison', function(e) {
                 e.preventDefault();
                 $.ajax({
-                    url: "expense_home/",
+                    url: "expense_comparison_barchart/",
                     type: "POST",
                     data: {
-                         date: $("id_date").val(),
-                         toDate: $("id_toDate").val(),
-                         expenseLabelCategory: $("id_expenseLabelCategory").val(),
-                        }
-                    success : function(json) {
+                         date: $("#id_date").val(),
+                         toDate: $("#id_toDate").val(),
+                         expenseLabelCategory: $("#id_filterComparison").val(),
+                         checkbox: $("#checkbox").val()
+                    },
+                    success: function(json) {
                             //$('#post-text').val(''); // remove the value from the input
                             console.log(json); // log the returned json to the console
                             console.log("success"); // another sanity check
-                        },
+                    },
                 })
             })
         </script>
 
         <div id="expenses-comparison-container" data-url="{% url 'expenses:expense_comparison_barchart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-            <script src="https://code.highcharts.com/highcharts.src.js"></script>
-            <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-            <script src="https://code.highcharts.com/modules/sankey.js"></script>
             <script>
                 $.ajax({
                 url: $("#expenses-comparison-container").attr("data-url"),
@@ -85,8 +438,9 @@
                     Highcharts.chart("expenses-comparison-container", data);
                 }
                 });
-            </script>
+            </script> {% endcomment %}
     </div>
+
 </div>
 </div>
 {% endblock body_content %}

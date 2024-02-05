@@ -113,6 +113,8 @@ class expenseComparison(forms.Form):
     
     expenseLabelCategory = forms.ChoiceField(choices=[(x,x) for x in h.getExpenseCategories("all")],label="Category",required=False,initial="INCOME")
     
+    checkbox = forms.BooleanField(label='Aggregate', required=False, widget=forms.CheckboxInput)
+    
     def getFromMonth(self):
         return self.date.month
     

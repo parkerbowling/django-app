@@ -70,12 +70,24 @@ def add_expense(request):
         "form":form
     }
     return render(request, 'add_expense.html', context)
-#
-# Pie Chart
-#
-def expense_piechart(request):
+
+def pie_chart_category_data(request, category):
+    print(category)
     
-    #dynamically get the Categories in case I decide to add or remove one of them and make them unique
+    dateNow = datetime.now()
+    currentYear = dateNow.year
+    currentMonth = dateNow.month
+    
+    categorySum = expenseReport.objects.values("date","title","value"
+                    ).filter(
+                        date__year=currentYear, date__month=currentMonth
+                    ).filter(
+                        expenseChoices=str(category))
+                    
+    return JsonResponse(list(categorySum), safe=False)
+
+def pie_chart_data(request):
+        #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     newSet = []
     newSet = h.getExpenseCategories()
     try:
@@ -84,15 +96,19 @@ def expense_piechart(request):
         print("no income reported")
     #name a json structure for inserting data into chart
     allCategoryData = {
-        "name": "Expenses",
+        "title": "",
         "data": [],
     }
+    
+    dataForAll = []
     
     #for every category (remember not all categories may have appeared yet) sum the values and add to data
     #will need to be able to filter on certain dates, like months and years
     dateNow = datetime.now()
     currentYear = dateNow.year
     currentMonth = dateNow.month
+    
+    allCategoryData["title"] = f"Expenses for {currentMonth}/{currentYear}"
     
     for i in newSet:
         
@@ -105,14 +121,6 @@ def expense_piechart(request):
                         expenseChoices=str(i)).aggregate(
                     Sum('value'))['value__sum']
                         
-        # will need an else statement if user wants to see lifetime expenses (all)
-        # else:
-        #
-        #     categorySum = expenseReport.objects.values("value"
-        #             ).filter(
-        #                 expenseChoices=str(i)).aggregate(
-        #             Sum('value'))['value__sum']
-            
         #if there is no data, no need to add to chart     
         if categorySum == None:
             continue
@@ -121,35 +129,18 @@ def expense_piechart(request):
             'name':str(i),
             'y': float(categorySum)
         }
+        
+        dataForAll.append(int(categorySum))
+
         allCategoryData['data'].append(data)
-        
-    #depending on selection, change this
-    chartTitle = ""
-    if True:
-        chartTitle = f"Total Expenses This Month {currentMonth}/{currentYear}"
-    # else:
-    #     chartTitle = "Total Expenses All"
-        
-    #json chart configuration
-    chart = {
-        'chart': {
-            'type': 'pie', 
-            # 'height': 300,
-            # 'width': 1000,
-            'renderTo':'expenses-pie-container'
-        },
-        'title': {'text': chartTitle},
-        'allowPointSelect': 'true',
-        'tooltip': {
-            'format': 
-                '{series.name}: <b>${y}</b><br/>',
-                'shared':'true'
-        },
-        'series': [allCategoryData]
-    }
-    
-    #return a JsonResponse so Highchart knows what to do with our data
-    return JsonResponse(chart)
+         
+    return JsonResponse(allCategoryData, safe=False)
+
+#
+# Pie Chart
+#
+def expense_piechart(request):
+    return
 
 #
 # Sankey Chart
@@ -312,6 +303,21 @@ def expense_sankeychart(request):
     
     return JsonResponse(chart)
 
+def comparison_chart_category_data(request,category,date):
+    print(category)
+    
+    dateNow = datetime.now()
+    currentMonth = int(date[:2])
+    currentYear = int(date[3:7])
+    
+    categorySum = expenseReport.objects.values("date","title","value"
+                    ).filter(
+                        date__year=currentYear, date__month=currentMonth
+                    ).filter(
+                        expenseChoices=str(category))
+                    
+    return JsonResponse(list(categorySum), safe=False)
+
 def expense_comparison_barchart(request):
     newSet = []
     newSet = h.getExpenseCategories()
@@ -336,25 +342,35 @@ def expense_comparison_barchart(request):
     
     #get category
     filterCategory = request.session.get("expenseLabelCategory")
+ 
+    
+    #check checkbox value
+    checkbox = request.session.get("checkbox")
+    #print(checkbox)
     
     #title
     chartTitle = "Comparison Chart"
     
     #initalize for chart json
-    data = []
+    data = {
+        "categories":[],
+        "series":[]
+    }
      
     #get list of months from range input
     month_list = period_range(start=f"{fromYear}-{fromMonth}-{fromDay}", end=f"{toYear}-{toMonth}-{toDay}", freq='M')
     month_list = [month.strftime("%m-%Y") for month in month_list]
     categoryLabelList = month_list
+    data['categories'] = categoryLabelList
     
     #do something if only one category is requested
     if filterCategory != "All Expenses" and filterCategory != "Savings":
+        
+        seriesData = []
     
         #data for each bar
         bar = {
             "name":filterCategory,
-            "type":'column',
             "data":[]
         }
         
@@ -370,7 +386,7 @@ def expense_comparison_barchart(request):
         #for each month
         for d in month_list:
             
-    #       get the sum of the category and store in a list        
+    #get the sum of the category and store in a list        
             dataSum = expenseReport.objects.values("value"
                     ).filter(
                         date__year=d[3:], date__month=d[:2]
@@ -386,11 +402,14 @@ def expense_comparison_barchart(request):
         #compute average of sums of categories    
         bar["data"] = listOfDataSum
         average["data"] = [avg(listOfDataSum) for i in range(len(listOfDataSum))]
-        data.append(bar)
-        data.append(average)
+        seriesData.append(bar)
+        seriesData.append(average)
+        data['series'] = seriesData
     
     #this needs work!
     elif filterCategory == "Savings":
+
+        seriesData = []
 
         bar = {
             "name":filterCategory,
@@ -413,7 +432,6 @@ def expense_comparison_barchart(request):
             
             bar = {
                 "name":'Savings',
-                "type":'column',
                 "data":[]
             }
             
@@ -422,11 +440,14 @@ def expense_comparison_barchart(request):
         savingsList = h.getAllExpenses_SavingsInMonthRange(month_list)
             
         bar['data'] = savingsList
-        data.append(bar)
+        seriesData.append(bar)
         average['data'] = [avg(savingsList) for i in range(len(savingsList))]
-        data.append(average)
+        seriesData.append(average)
+        data['series'] = seriesData
     
     else: #for all expenses
+        
+        seriesData = []
         
         #average data (still need to implement this)
         average = {
@@ -440,7 +461,6 @@ def expense_comparison_barchart(request):
             
             bar = {
                 "name":c,
-                "type":'column',
                 "data":[]
             }
             
@@ -464,12 +484,13 @@ def expense_comparison_barchart(request):
                            
                 listOfDataSum.append(float(dataSum))
                 
-        
+
             bar['data'] = listOfDataSum
-            data.append(bar)
-            
+            seriesData.append(bar)
+        
         listoftotalexpenses = []
         
+        #I think this is for the average line, need to actually implement
         for d in month_list:
             
             totalPerMonth = 0
@@ -491,46 +512,7 @@ def expense_comparison_barchart(request):
             
             listoftotalexpenses.append(totalPerMonth)
         
+        data['series'] = seriesData
         #print(listoftotalexpenses)
-            
-    average = {
-            'type': 'spline',
-            'name': 'Average',
-            'data': []
-        }   
-    
-    chart = {
-        "chart": {
-            "type": 'column',
-            'renderTo':'expenses-comparison-container',
-        },
-        "title": {
-            "text": chartTitle, 
-        },
-        "xAxis": {
-            "categories": categoryLabelList,
-            "crosshair": "true",
-        },
-        "yAxis": {
-            "min": 0,
-            "title": {
-                "text": 'Dollars'
-            }
-        },
-        "tooltip": {
-            'headerFormat': None,
-            'valueSuffix':'Dollars',
-            'pointFormat':
-                '{series.name}: ${point.y:.2f}',
-        },
-        "plotOptions": {
-            "column": {
-                "pointPadding": 0.2,
-                "borderWidth": 0
-            }
-        },
-        "series": data
-    } 
-    
-    return JsonResponse(chart)
+    return JsonResponse(data, safe=False)
     
