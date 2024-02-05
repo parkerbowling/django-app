@@ -17,11 +17,13 @@
 ## Plan For Website
 
 ### Phase 3
- - "GAS_REPAIRS" still exists in the database but is no longer used, need to get rid of --> see the choices on the comparison chart
+ - *BUG* "GAS_REPAIRS" still exists in the database but is no longer used, need to get rid of --> see the choices on the comparison chart
+ - *BUG* The close button doesn't work for the comparison chart
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
- - Can we have the parts of the chart be clickable? Click a section of the chart and it pulls up those expenses for that. [Check this out](https://stackoverflow.com/questions/20964443/highcharts-making-a-point-clickable)
+ - ~~Can we have the parts of the chart be clickable? Click a section of the chart and it pulls up those expenses for that.~~ :white_check_mark:
+ - *Does the Sankey need to be clickable?*
  - Web scrape: user enters a URL of a recipe and it automatically gets scraped off and inserted into the database
- - Fix Update recipe date bug
+ - *BUG* Fix Update recipe date bug
  - Style website that looks acceptable and not from 2006
  - Try to really clean up the code (if possible) and think about optimization
 
@@ -43,6 +45,7 @@
 #### Feature Wishlist
 
 - Expense Tracker
+    0. Automatic Expenses
     1. OCR for receipts instead of manually entering it
     2. Add a budget feature that gives goals on what you want to spend that month
     3. Wrap the database around an A.I. (LLM) that can compute any data viz you ask it for
