@@ -19,6 +19,7 @@
 ### Phase 3
  - *BUG* "GAS_REPAIRS" still exists in the database but is no longer used, need to get rid of --> see the choices on the comparison chart
  - *BUG* The close button doesn't work for the comparison chart
+ - Implement the aggregate feature
  - Add a budget feature so a user can create a dynamic monthly budget and compare it with expenses for past and current month
  - ~~Can we have the parts of the chart be clickable? Click a section of the chart and it pulls up those expenses for that.~~ :white_check_mark:
  - *Does the Sankey need to be clickable?*
