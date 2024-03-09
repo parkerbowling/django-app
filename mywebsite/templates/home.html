@@ -6,4 +6,56 @@
  
 {% block body_content %}
     <p>This is the home page</p>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <div id="budget-container">
+    <script>
+        async function fetchDataAndRenderChart() {
+            const response = await fetch('/budget-chart-data/');
+            const data = await response.json();
+        
+            Highcharts.chart('budget-container', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: data.title
+                },
+                xAxis: {
+                    categories: data.categories
+                },
+                yAxis: {
+                    title: {
+                        text: 'Dollars'
+                    }
+                    
+                },
+                plotOptions: {
+                    series: {
+                        grouping: false
+                    },
+                },
+                tooltip: {
+                    shared: true,
+                    formatter: function () {
+                        var diff = this.points[1].y - this.points[0].y;
+                        if (diff > 0) {
+                            var over = 'Over budget by:'
+                        } else {
+                            var over = 'Under budget by:'
+                        }
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.points[0].series.name + ': ' + '$' + this.points[0].y + '<br/>' +
+                            this.points[1].series.name + ': ' + '$' + this.points[1].y + '<br/>' +
+                            over + ' $' + diff;
+                    }
+                },
+                series: data.series
+            });
+        }
+        
+        fetchDataAndRenderChart();
+        </script>
+    </div>
+
+
 {% endblock body_content %}

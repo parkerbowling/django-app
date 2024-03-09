@@ -1,5 +1,5 @@
 from django import forms
-from .models import expenseReport
+from .models import expenseReport, BudgetCategory
 from datetime import datetime, date
 from . import helper as h
 
@@ -100,7 +100,6 @@ class expenseReportForm(forms.ModelForm):
             'date','title','expenseChoices','value','note'
         ]
         
-
 class DateInput(forms.DateInput):
     input_type = 'date'
     initial = f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}"
@@ -136,5 +135,8 @@ class expenseComparison(forms.Form):
             if end_time < from_time:
                 raise forms.ValidationError("End date cannot be earlier than start date!")
         return cleaned_data
-    
-    
+
+class BudgetCategoryForm(forms.ModelForm):
+    class Meta:
+        model = BudgetCategory
+        fields = ['name'] 

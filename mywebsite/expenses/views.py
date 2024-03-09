@@ -1,7 +1,7 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Sum
-from .models import expenseReport
-from .forms import expenseReportForm, expenseComparison
+from .models import expenseReport, BudgetCategory
+from .forms import expenseReportForm, expenseComparison, BudgetCategoryForm
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
@@ -13,7 +13,107 @@ from numpy import average as avg
 #temporary home page for now
 def home(request):
     #render takes in a request and an HTML page to render to view
+    
+    
+    
     return render(request, 'home.html')
+
+def budget_chart_data(request):
+    #budget_categories = list(BudgetCategory.objects.all())
+    budget_categories = h.getExpenseCategories()
+    budget_categories.remove("INCOME")
+    print(budget_categories)
+    
+    dateNow = datetime.now()
+    currentYear = dateNow.year
+    currentMonth = dateNow.month
+    
+    title = f'Monthly Budget for {currentMonth}/{currentYear}' 
+    
+    data = []
+    
+    data_of_expenses = []
+    
+    for i in budget_categories:
+        categorySum = expenseReport.objects.values("value"
+                    ).filter(
+                        date__year=currentYear, date__month=currentMonth
+                    ).filter(
+                        expenseChoices=str(i)).aggregate(
+                    Sum('value'))['value__sum']
+                        
+        if categorySum == None:
+            categorySum = 0
+                        
+        data_of_expenses.append(float(categorySum))
+        
+    #this is where budget info will go
+    #it will be fake data at the moment
+    #data.append([0, 0, 0, 0, 0, 0, 0, 3, 7, 4, 10, 11])
+    
+    #appends the expense data
+    data.append(data_of_expenses)
+    
+    #Sort the categories and data by the sum of each series data in ascending order
+    #Sort the categories and data based on the values in the second list
+    sorted_indices = sorted(range(len(data[0])), key=lambda x: data[0][x])
+    budget_categories = [budget_categories[i] for i in sorted_indices]
+    data = [[data[j][i] for i in sorted_indices] for j in range(len(data))]
+    
+    #if I make budget list after this I can use the newly ordered expense categories to line
+    #up automatically since I've sorted this once. this will resolve the budget amounts being
+    #out of order. SO do the budget value querying here.
+    data.append([10, 10, 10, 10, 10, 10, 10, 3, 7, 4, 10, 11]) #fake data for now
+               
+    final_data = {
+        'categories': budget_categories,
+        'title': title,
+        'series': [
+            {'name': 'Alloted Budget Amount', 'data': data[1], 'color':'#A1E097'},
+            {'name': 'Expense Amount', 'data': data[0], 'color':'#F56C6C'} 
+        ]
+    }
+               
+    return JsonResponse(final_data)
+    
+
+def manage_budget_categories(request):
+    budget_categories = BudgetCategory.objects.all()
+
+    if request.method == 'POST':
+        form = BudgetCategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save()
+            return redirect('manage_budget_categories')
+    else:
+        form = BudgetCategoryForm()
+
+    return render(request, 'budget/manage_budget_categories.html', {'form': form, 'budget_categories': budget_categories})
+
+def edit_budget_category(request, category_id):
+    category = get_object_or_404(BudgetCategory, id=category_id)
+
+    if request.method == 'POST':
+        form = BudgetCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            form.save()
+            return redirect('manage_budget_categories')
+
+    else:
+        form = BudgetCategoryForm(instance=category)
+
+    return render(request, 'budget/edit_budget_category.html', {'form': form, 'category': category})
+
+def delete_budget_category(request, category_id):
+    category = get_object_or_404(BudgetCategory, id=category_id)
+
+    if request.method == 'POST':
+        category.delete()
+        return redirect('manage_budget_categories')
+
+    return render(request, 'budget/delete_budget_category.html', {'category': category})
+
+
 
 def expense_home(request):
     

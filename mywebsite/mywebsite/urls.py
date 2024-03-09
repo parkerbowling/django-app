@@ -40,6 +40,7 @@ urlpatterns = [
     path('expense-comparison-barchart/',expense_comparison_barchart,name='expense-comparison-barchart'),
     path('comparison-chart-category-data/<str:category>/<str:date>/',comparison_chart_category_data,name='comparison-chart-category-data'),
     #name expenses urls by including recipes namespace
+    path('budget-chart-data/',budget_chart_data,name="budget-chart-data"),
     path('recipes/',include('recipes.urls',namespace='recipes')),
     
     #path('chartGPT/',include('chartGPT.urls',namespace='chartGPT')),
