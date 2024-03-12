@@ -2,6 +2,7 @@ from django import forms
 from .models import expenseReport, BudgetCategory
 from datetime import datetime, date
 from . import helper as h
+from .models import ExpenseCategory
 
 class DateSelectorWidget(forms.MultiWidget):
     def __init__(self, attrs=None):
@@ -68,36 +69,42 @@ class expenseReportForm(forms.ModelForm):
         (MISCELLANEOUS, 'Miscellaneous')
     )
     
-    #the first field the user is able to select
-    date = forms.DateField(widget=forms.DateTimeInput(                     #this defaults to today's date to elimate one less button to press
-        attrs={'class':'date-time-input','placeholder':'YYYY-MM-DD',}),    #gives it an html class name and placeholder which is redundent
-        initial=datetime.today().strftime('%Y-%m-%d'),                     #inital gives the default value (today) and label, well, labels it
-        label="Date")
-    
-    #title of recipe and adds a placeholder in the textbox
-    title = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'Expense Title'}),
-        label="Title")
-    
-    #gives a list of expense choices
-    expenseChoices = forms.ChoiceField(widget=forms.Select,                #user is able to select from a list of options
-                                       choices=CHOICE,                     #choices are assigned and label for client side
-                                       label="Expense Category")
-    
-    #expense value that user just purchased             
-    value = forms.DecimalField(max_digits=1000,                            #gives it the max digits it can take
-                               widget=forms.NumberInput(                   #class for HTML and label
-                               attrs={'class':'value-input'}),
-                               label="Amount")
-    #note user can add
-    note = forms.CharField(widget=forms.TextInput(attrs={'class':'note-input','placeholder':'Add note'}), #not required but placeholder for what user can add
-                                                  required=False,
-                                                  label="Note")
-    
-    #metadata for the report
+    date = forms.DateField(
+        widget=forms.DateTimeInput(
+            attrs={'class': 'date-time-input', 'placeholder': 'YYYY-MM-DD'},
+        ),
+        initial=datetime.today().strftime('%Y-%m-%d'),
+        label="Date"
+    )
+
+    title = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'note-input', 'placeholder': 'Expense Title'}),
+        label="Title"
+    )
+
+    # Modify the expenseChoices field to use a ModelChoiceField with ExpenseCategory queryset
+    expenseChoices = forms.ModelChoiceField(
+        widget=forms.Select(attrs={'class': 'your-class-name'}),
+        queryset=BudgetCategory.objects.all(),  # Specify the queryset for ExpenseCategory
+        label="Expense Category"
+    )
+
+    value = forms.DecimalField(
+        max_digits=1000,
+        widget=forms.NumberInput(attrs={'class': 'value-input'}),
+        label="Amount"
+    )
+
+    note = forms.CharField(
+        widget=forms.TextInput(attrs={'class': 'note-input', 'placeholder': 'Add note'}),
+        required=False,
+        label="Note"
+    )
+
     class Meta:
         model = expenseReport
         fields = [
-            'date','title','expenseChoices','value','note'
+            'date', 'title', 'expenseChoices', 'value', 'note'
         ]
         
 class DateInput(forms.DateInput):
@@ -110,7 +117,7 @@ class expenseComparison(forms.Form):
     
     toDate = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
     
-    expenseLabelCategory = forms.ChoiceField(choices=[(x,x) for x in h.getExpenseCategories("all")],label="Category",required=False,initial="INCOME")
+    expenseLabelCategory = forms.ChoiceField(choices=[BudgetCategory.objects.all()],label="Category",required=False,initial="INCOME")
     
     checkbox = forms.BooleanField(label='Aggregate', required=False, widget=forms.CheckboxInput)
     
@@ -139,4 +146,8 @@ class expenseComparison(forms.Form):
 class BudgetCategoryForm(forms.ModelForm):
     class Meta:
         model = BudgetCategory
-        fields = ['name'] 
+        fields = ['name', 'value'] 
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),  # Add any additional attributes or classes
+            'value': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
+        }

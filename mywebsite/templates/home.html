@@ -2,10 +2,121 @@
 
 {% block title %}
     <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+
+    <!-- jQuery, Popper.js, and Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
 {% endblock title %}
  
 {% block body_content %}
     <p>This is the home page</p>
+    <div id="edit-category-button">
+        <button type="button" class="btn btn-primary" onclick="loadModalContent()">
+            Edit Categories
+        </button>
+
+        <script>
+            async function editCategory(categoryId) {
+                try {
+                    const response = await fetch(`/budget/edit/${categoryId}/`);
+                    const data = await response.text();
+            
+                    // Inject the retrieved content into the editCategoryModalBody
+                    $('#editCategoryModalBody').html(data);
+                    $('#editCategoryModal').modal('show');
+                } catch (error) {
+                    console.error('Error editing category:', error);
+                }
+            }
+
+            // Function to handle form submission
+            async function handleSubmission(formId, modalId) {
+                try {
+                    const form = $(`#${formId}`);
+                    const formData = new FormData(form[0]);
+            
+                    const response = await fetch(form.attr('action'), {
+                        method: 'POST',
+                        body: formData,
+                    });
+            
+                    if (response.ok) {
+                        // Success: reload the modal or update its content
+                        const modal = $(`#${modalId}`);
+                        const modalBody = modal.find('.modal-body');
+            
+                        // Example: Reload the modal content using loadModalContent function
+                        await loadModalContent(modalBody);
+            
+                        // Optionally, hide the modal if desired
+                        modal.modal('hide');
+                    } else {
+                        // Error: handle the error case
+                        console.error('Form submission failed:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error handling form submission:', error);
+                }
+            }
+            
+            async function deleteCategory(categoryId) {
+                try {
+                    // Perform an AJAX request to delete the category
+                    console.log(categoryId)
+                    const response = await fetch(`/expenses/budget/delete/${categoryId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    });
+
+                    if (response.ok) {
+                        // Handle success (e.g., refresh the page or update UI)
+                        console.log('Category deleted successfully');
+                    } else {
+                        // Handle errors (e.g., display an error message)
+                        console.error('Error deleting category:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                }
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Check if this cookie name matches the one we are looking for
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        
+            async function loadModalContent() {
+                try {
+                    const response = await fetch('/expenses/budget/modal/');
+                    const data = await response.text();
+                    // Append the modal content to the body
+                    $('body').append(data);
+                    // Show the modal
+                    $('#budgetModal').modal('show');
+                } catch (error) {
+                    console.error('Error loading modal content:', error);
+                }
+            }
+        </script>
+
+    </div>
     <script src="https://code.highcharts.com/highcharts.js"></script>
     <div id="budget-container">
     <script>

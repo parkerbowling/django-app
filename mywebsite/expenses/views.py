@@ -1,7 +1,8 @@
 from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Sum
 from .models import expenseReport, BudgetCategory
-from .forms import expenseReportForm, expenseComparison, BudgetCategoryForm
+from .forms import expenseReportForm, expenseComparison, BudgetCategoryForm, ExpenseCategory
+from django.template.loader import render_to_string
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
@@ -14,15 +15,19 @@ from numpy import average as avg
 def home(request):
     #render takes in a request and an HTML page to render to view
     
-    
+
     
     return render(request, 'home.html')
 
+
 def budget_chart_data(request):
-    #budget_categories = list(BudgetCategory.objects.all())
-    budget_categories = h.getExpenseCategories()
-    budget_categories.remove("INCOME")
-    print(budget_categories)
+
+    budget_categories = list(BudgetCategory.objects.all())
+
+    try:
+        budget_categories.remove("Income")
+    except ValueError:
+        print("something really bad happened")
     
     dateNow = datetime.now()
     currentYear = dateNow.year
@@ -75,45 +80,59 @@ def budget_chart_data(request):
     }
                
     return JsonResponse(final_data)
-    
+   
+##############################  
 
-def manage_budget_categories(request):
-    budget_categories = BudgetCategory.objects.all()
+def budget_modal_view(request):
+    categories = BudgetCategory.objects.all()
+    form = BudgetCategoryForm()
+    print("in the budget modal view")
+    return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
 
+def debug(request):
+    categories = BudgetCategory.objects.all()
+    form = BudgetCategoryForm()
+    return render(request, 'delete_budget_category_form.html', {'form': form})
+
+def save_budget_category_view(request):
     if request.method == 'POST':
         form = BudgetCategoryForm(request.POST)
         if form.is_valid():
-            category = form.save()
-            return redirect('manage_budget_categories')
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'error': form.errors}, status=400)
     else:
+        # For GET requests, return an empty form
         form = BudgetCategoryForm()
+        return render(request, 'budget_modal_form.html', {'form': form})
 
-    return render(request, 'budget/manage_budget_categories.html', {'form': form, 'budget_categories': budget_categories})
-
-def edit_budget_category(request, category_id):
+def edit_category_view(request, category_id):
     category = get_object_or_404(BudgetCategory, id=category_id)
 
     if request.method == 'POST':
         form = BudgetCategoryForm(request.POST, instance=category)
         if form.is_valid():
             form.save()
-            return redirect('manage_budget_categories')
+            return JsonResponse({'success': True})
+        else:
+            return JsonResponse({'error': form.errors}, status=400)
 
-    else:
-        form = BudgetCategoryForm(instance=category)
+    return render(request, 'edit_budget_category.html', {'form': BudgetCategoryForm(instance=category)})
 
-    return render(request, 'budget/edit_budget_category.html', {'form': form, 'category': category})
-
-def delete_budget_category(request, category_id):
+def delete_category_view(request, category_id):
+    # Retrieve the instance of BudgetCategory or return a 404 response
     category = get_object_or_404(BudgetCategory, id=category_id)
 
-    if request.method == 'POST':
+    try:
+        # Attempt to delete the BudgetCategory instance
         category.delete()
-        return redirect('manage_budget_categories')
+        return JsonResponse({'success': True})
+    except Exception as e:
+        # If an exception occurs, return an error response with details
+        return JsonResponse({'error': f'Delete failed: {str(e)}'}, status=500)
 
-    return render(request, 'budget/delete_budget_category.html', {'category': category})
-
-
+#################################
 
 def expense_home(request):
     
