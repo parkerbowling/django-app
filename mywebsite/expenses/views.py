@@ -3,6 +3,7 @@ from django.db.models import Sum
 from .models import expenseReport, BudgetCategory
 from .forms import expenseReportForm, expenseComparison, BudgetCategoryForm, ExpenseCategory
 from django.template.loader import render_to_string
+from django.core.serializers import serialize
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
@@ -21,64 +22,45 @@ def home(request):
 
 
 def budget_chart_data(request):
-
     budget_categories = list(BudgetCategory.objects.all())
+    date_now = datetime.now()
+    current_year = date_now.year
+    current_month = date_now.month
+    title = f'Monthly Budget for {current_month}/{current_year}'
 
-    try:
-        budget_categories.remove("Income")
-    except ValueError:
-        print("something really bad happened")
-    
-    dateNow = datetime.now()
-    currentYear = dateNow.year
-    currentMonth = dateNow.month
-    
-    title = f'Monthly Budget for {currentMonth}/{currentYear}' 
-    
-    data = []
-    
     data_of_expenses = []
-    
-    for i in budget_categories:
-        categorySum = expenseReport.objects.values("value"
-                    ).filter(
-                        date__year=currentYear, date__month=currentMonth
-                    ).filter(
-                        expenseChoices=str(i)).aggregate(
-                    Sum('value'))['value__sum']
-                        
-        if categorySum == None:
-            categorySum = 0
-                        
-        data_of_expenses.append(float(categorySum))
-        
-    #this is where budget info will go
-    #it will be fake data at the moment
-    #data.append([0, 0, 0, 0, 0, 0, 0, 3, 7, 4, 10, 11])
-    
-    #appends the expense data
-    data.append(data_of_expenses)
-    
-    #Sort the categories and data by the sum of each series data in ascending order
-    #Sort the categories and data based on the values in the second list
-    sorted_indices = sorted(range(len(data[0])), key=lambda x: data[0][x])
+
+    for cat in budget_categories:
+        category_sum = expenseReport.objects.values("value").filter(
+            date__year=current_year, date__month=current_month
+        ).filter(
+            category__name=str(cat)
+        ).aggregate(
+            Sum('value')
+        )['value__sum'] or 0
+
+        data_of_expenses.append(float(category_sum))
+
+    sorted_indices = sorted(range(len(data_of_expenses)), key=lambda x: data_of_expenses[x])
     budget_categories = [budget_categories[i] for i in sorted_indices]
-    data = [[data[j][i] for i in sorted_indices] for j in range(len(data))]
-    
-    #if I make budget list after this I can use the newly ordered expense categories to line
-    #up automatically since I've sorted this once. this will resolve the budget amounts being
-    #out of order. SO do the budget value querying here.
-    data.append([10, 10, 10, 10, 10, 10, 10, 3, 7, 4, 10, 11]) #fake data for now
-               
+    data_of_expenses = [data_of_expenses[i] for i in sorted_indices]
+
+    # Extract numeric values from BudgetCategory instances
+    budget_values = [float(category.value) for category in budget_categories]
+
+    # Convert budget_values to a JSON-serializable list
+    budget_values_json = list(map(float, budget_values))
+
     final_data = {
-        'categories': budget_categories,
+        'categories': [category.name for category in budget_categories],
+        'budget_values': budget_values_json,
         'title': title,
         'series': [
-            {'name': 'Alloted Budget Amount', 'data': data[1], 'color':'#A1E097'},
-            {'name': 'Expense Amount', 'data': data[0], 'color':'#F56C6C'} 
+            {'name': 'Alloted Budget Amount', 'data': budget_values_json, 'color': '#A1E097'},
+            {'name': 'Expense Amount', 'data': data_of_expenses, 'color': '#F56C6C'}
         ]
     }
-               
+
     return JsonResponse(final_data)
    
 ##############################  
@@ -114,11 +96,13 @@ def edit_category_view(request, category_id):
         form = BudgetCategoryForm(request.POST, instance=category)
         if form.is_valid():
             form.save()
-            return JsonResponse({'success': True})
+            # Serialize the category and send it as JSON
+            serialized_category = serialize('json', [category])
+            return JsonResponse({'success': True, 'category': serialized_category})
         else:
             return JsonResponse({'error': form.errors}, status=400)
 
-    return render(request, 'edit_budget_category.html', {'form': BudgetCategoryForm(instance=category)})
+    return render(request, 'edit_budget_category_form.html', {'form': BudgetCategoryForm(instance=category)})
 
 def delete_category_view(request, category_id):
     # Retrieve the instance of BudgetCategory or return a 404 response
@@ -129,6 +113,7 @@ def delete_category_view(request, category_id):
         category.delete()
         return JsonResponse({'success': True})
     except Exception as e:
+        print("exception!")
         # If an exception occurs, return an error response with details
         return JsonResponse({'error': f'Delete failed: {str(e)}'}, status=500)
 
@@ -438,12 +423,13 @@ def comparison_chart_category_data(request,category,date):
     return JsonResponse(list(categorySum), safe=False)
 
 def expense_comparison_barchart(request):
-    newSet = []
-    newSet = h.getExpenseCategories()
+    newSet = list(BudgetCategory.objects.all())
     try:
-        newSet.remove("INCOME")
+        newSet.remove("Income")
     except ValueError:
         print("no income reported")
+    
+    print(newSet)
     
     #gets the date input from the user
     fromDate = request.session.get("date") #on first start this has no value, need to chaange this to a try statement

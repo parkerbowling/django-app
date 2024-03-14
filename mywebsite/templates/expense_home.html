@@ -180,6 +180,8 @@
         
           </script>
 
+          {% comment %} //Good up to here! {% endcomment %}
+
     </div> 
     <div class="column" name="sankey-chart" display="inline">
         <div id="expenses-sankey-container" data-url="{% url 'expenses:expense_sankeychart' %}" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
@@ -194,11 +196,14 @@
             });
         </script>
     </div>
+
+    {% comment %} Good until here! {% endcomment %}
+    {% comment %} error is here! {% endcomment %}
 <div class="row1">
-    <div class="column" name="expense_comparison_barchart" display="inline">
+  <div class="column" name="expense_comparison_barchart" display="inline">
         <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
             {% csrf_token %}
-            {{ form.as_p }}
+            {% comment %} {{ form.as_p }} {% endcomment %}
             <input type="submit" value="Save"/>
             <ul class="messages">
                 {% for message in messages %}
@@ -242,7 +247,10 @@
         }
       </style>
     </head>
+    
     <body>
+
+
       <div id="comparisonContainer" style="height: 300px;"></div>
     
       <!-- Modal -->

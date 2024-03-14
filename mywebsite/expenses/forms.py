@@ -32,42 +32,6 @@ class DateSelectorWidget(forms.MultiWidget):
 
 class expenseReportForm(forms.ModelForm):
     #variable names which the machine sees, redundent but might help me later
-    RENT_MORTAGAGE = 'RENT_MORTGAGE'
-    GAS_TRANSIT = 'GAS_TRANSIT'
-    INCOME = 'INCOME'
-    TAXES = 'TAXES'
-    UTILITIES = 'UTILITIES'
-    GROCERIES = 'GROCERIES'
-    DINE_OUT = 'DINE_OUT'
-    ENTERTAINMENT = 'ENTERTAINMENT'
-    TRAVEL = 'TRAVEL'
-    SHOPPING = 'SHOPPING'
-    REPAIRS = 'REPAIRS'
-    HEALTHCARE = 'HEALTHCARE'
-    GIVING = 'GIVING'
-    SELF_CARE = 'SELF_CARE'
-    INVESTING = 'INVESTING'
-    MISCELLANEOUS = 'MISCELLANEOUS'
-
-    #choices for the user. the first item is what the machine sees, the second is what the user sees
-    CHOICE = (
-        (RENT_MORTAGAGE,'Rent/Mortgage'),
-        (GAS_TRANSIT, 'Gas/Transit'),
-        (INCOME, 'Income'),
-        (TAXES, 'Taxes'),
-        (UTILITIES, 'Utilites'),
-        (GROCERIES, 'Groceries'),
-        (DINE_OUT, 'Dine Out'),
-        (ENTERTAINMENT, 'Entertainment'),
-        (TRAVEL, 'Travel'),
-        (SHOPPING, 'Shopping'),
-        (REPAIRS, 'Repairs'),
-        (HEALTHCARE, 'Healthcare'),    
-        (GIVING, 'Giving'),
-        (SELF_CARE, 'Self Care'),
-        (INVESTING, 'Investing'),
-        (MISCELLANEOUS, 'Miscellaneous')
-    )
     
     date = forms.DateField(
         widget=forms.DateTimeInput(
@@ -83,7 +47,7 @@ class expenseReportForm(forms.ModelForm):
     )
 
     # Modify the expenseChoices field to use a ModelChoiceField with ExpenseCategory queryset
-    expenseChoices = forms.ModelChoiceField(
+    category = forms.ModelChoiceField(
         widget=forms.Select(attrs={'class': 'your-class-name'}),
         queryset=BudgetCategory.objects.all(),  # Specify the queryset for ExpenseCategory
         label="Expense Category"
@@ -104,7 +68,7 @@ class expenseReportForm(forms.ModelForm):
     class Meta:
         model = expenseReport
         fields = [
-            'date', 'title', 'expenseChoices', 'value', 'note'
+            'date', 'title', 'category', 'value', 'note'
         ]
         
 class DateInput(forms.DateInput):
@@ -151,3 +115,5 @@ class BudgetCategoryForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),  # Add any additional attributes or classes
             'value': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
         }
+        
+''''''

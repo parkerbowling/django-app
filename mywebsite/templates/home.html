@@ -20,14 +20,15 @@
         </button>
 
         <script>
+            // Async function to load edit form content
             async function editCategory(categoryId) {
                 try {
-                    const response = await fetch(`/budget/edit/${categoryId}/`);
+                    const response = await fetch(`/expenses/budget/edit/${categoryId}/`);
                     const data = await response.text();
-            
+
                     // Inject the retrieved content into the editCategoryModalBody
-                    $('#editCategoryModalBody').html(data);
-                    $('#editCategoryModal').modal('show');
+                    $('#modalBodyContent').html(data);
+                    $('#budgetModal').modal('show');
                 } catch (error) {
                     console.error('Error editing category:', error);
                 }
@@ -46,6 +47,7 @@
             
                     if (response.ok) {
                         // Success: reload the modal or update its content
+                        console.log(formData);
                         const modal = $(`#${modalId}`);
                         const modalBody = modal.find('.modal-body');
             
