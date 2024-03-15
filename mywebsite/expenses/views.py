@@ -23,6 +23,8 @@ def home(request):
 
 def budget_chart_data(request):
     budget_categories = list(BudgetCategory.objects.all())
+    print(budget_categories)
+    print(budget_categories[0].value)
     date_now = datetime.now()
     current_year = date_now.year
     current_month = date_now.month
@@ -41,15 +43,23 @@ def budget_chart_data(request):
 
         data_of_expenses.append(float(category_sum))
 
+    # something is wrong here, need to rethink
+    # the order of the categories is not right
     sorted_indices = sorted(range(len(data_of_expenses)), key=lambda x: data_of_expenses[x])
     budget_categories = [budget_categories[i] for i in sorted_indices]
     data_of_expenses = [data_of_expenses[i] for i in sorted_indices]
 
     # Extract numeric values from BudgetCategory instances
-    budget_values = [float(category.value) for category in budget_categories]
-
+    try:
+        budget_values = [float(category.value) for category in budget_categories]
+    except TypeError:
+        print("There are null values, oh no!")
+        budget_values = []
+    print("Theses are the budget_values before json serialized: ",budget_values)
+    
     # Convert budget_values to a JSON-serializable list
     budget_values_json = list(map(float, budget_values))
+    print("These are the values after: ",budget_values_json)
 
     final_data = {
         'categories': [category.name for category in budget_categories],
@@ -186,16 +196,17 @@ def pie_chart_category_data(request, category):
                     ).filter(
                         date__year=currentYear, date__month=currentMonth
                     ).filter(
-                        expenseChoices=str(category))
+                        category__name=str(category))
                     
     return JsonResponse(list(categorySum), safe=False)
 
 def pie_chart_data(request):
         #dynamically get the Categories in case I decide to add or remove one of them and make them unique
-    newSet = []
-    newSet = h.getExpenseCategories()
+    newSet = list(BudgetCategory.objects.all())
+    for i in range(len(newSet)):
+        newSet[i] = newSet[i].name
     try:
-        newSet.remove("INCOME")
+        newSet.remove("Income")
     except ValueError:
         print("no income reported")
     #name a json structure for inserting data into chart
@@ -218,15 +229,16 @@ def pie_chart_data(request):
         
         #gets all values for category and sums
         if True:
-            categorySum = expenseReport.objects.values("value"
-                    ).filter(
-                        date__year=currentYear, date__month=currentMonth
-                    ).filter(
-                        expenseChoices=str(i)).aggregate(
-                    Sum('value'))['value__sum']
+            categorySum = expenseReport.objects.values("value").filter(
+            date__year=currentYear, date__month=currentMonth
+            ).filter(
+                category__name=str(i)
+            ).aggregate(
+                Sum('value')
+            )['value__sum'] or 0
                         
         #if there is no data, no need to add to chart     
-        if categorySum == None:
+        if categorySum == 0:
             continue
 
         data = {
@@ -252,10 +264,11 @@ def expense_piechart(request):
 def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
-    newSet = []
-    newSet = h.getExpenseCategories()
+    newSet = list(BudgetCategory.objects.all())
+    for i in range(len(newSet)):
+        newSet[i] = newSet[i].name
     try:
-        newSet.remove("INCOME")
+        newSet.remove("Income")
     except ValueError:
         print("no income reported")
 
@@ -267,28 +280,30 @@ def expense_sankeychart(request):
     currentMonth = dateNow.month
     
     #get the income total
-    incomeSum = expenseReport.objects.values("value"
-                    ).filter(
-                        date__year=currentYear, date__month=currentMonth
-                    ).filter(
-                        expenseChoices=str("INCOME")).aggregate(
-                    Sum('value'))['value__sum']
-              
-    #check for no income          
-    if incomeSum == None:
-        incomeSum = 0
+    incomeSum = expenseReport.objects.values("value").filter(
+            date__year=currentYear, date__month=currentMonth
+        ).filter(
+            category__name=str("Income")
+        ).aggregate(
+            Sum('value')
+        )['value__sum'] or 0
+    
+    #check for no income SHOULDN"T NEED THIS         
+    # if incomeSum == None:
+    #     incomeSum = 0
                
     #get all expenses  
     expensesSum = 0  
     expensesDict = {}
                        
     for i in newSet:
-        categorySum = expenseReport.objects.values("value"
-                    ).filter(
-                        date__year=currentYear, date__month=currentMonth
-                    ).filter(
-                        expenseChoices=str(i)).aggregate(
-                    Sum('value'))['value__sum']
+        categorySum = expenseReport.objects.values("value").filter(
+                date__year=currentYear, date__month=currentMonth
+            ).filter(
+                category__name=str(i)
+            ).aggregate(
+                Sum('value')
+            )['value__sum'] or 0
         if categorySum == None:
             continue
         
@@ -299,18 +314,22 @@ def expense_sankeychart(request):
     #calculate income and savings
     incomeSum = float(incomeSum)
     savingsSum = incomeSum - expensesSum
+    
+    #if this is a negative number, make it zero for the chart - might need to skip it
+    if savingsSum < 0:
+        savingsSum = 0
         
     #append for json file                
     data.append(
-        ['Income','Savings',savingsSum]
+        ['Income','Savings',savingsSum,'#adf5a1']
     )
     data.append(
-        ['Income','Expenses',expensesSum]
+        ['Income','Expenses',expensesSum,'#adf5a1']
     )
 
     for index, key in expensesDict.items():
         data.append(
-            ['Expenses',index,key]
+            ['Expenses',index,key,'#ff7676']
         )
 
     #add if else when chart wants to be changed
@@ -319,6 +338,21 @@ def expense_sankeychart(request):
         chartTitle = f"Expenses and Savings This Month {currentMonth}/{currentYear}"
     # else:
     #     chartTitle = "Total Expenses All"
+    
+    #make the Nodes list here, so it's dynamic
+    nodeColors = []
+
+# Iterate over the category IDs and create a dictionary for each node
+    for category_id in newSet:
+        node = {
+            'id': category_id,
+            'color': '#ff7676'  # You can set color dynamically based on some condition if needed
+        }
+        nodeColors.append(node)
+    
+    nodeColors.append({'id': 'Savings','color': '#adf5a1'})
+    nodeColors.append({'id': 'Income','color': '#adf5a1'})
+    nodeColors.append({'id': 'Expenses','color': '#ff7676'})
     
     #chart json
     chart = {
@@ -337,113 +371,84 @@ def expense_sankeychart(request):
     },
         'series': [{
             'name':'Amount',
-            'keys':['from','to','weight'],
-            'nodes': [
-                {
-                    'id':'Income',
-                    'color':'#adf5a1'
-                },
-                {
-                    'id':'Savings',
-                    'color':'#adf5a1'
-                },
-                {
-                    'id':'Expenses',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'GROCERIES',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'GAS_REPAIRS',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'DINE_OUT',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'RENT_MORTGAGE',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'TAXES',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'UTILITIES',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'GIVING',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'HEALTHCARE',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'HOME_IMPROVEMENT',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'SHOPPING',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'TRAVEL',
-                    'color':'#ff7676'
-                },
-                {
-                    'id':'ENTERTAINMENT',
-                    'color':'#ff7676'
-                },
-            ],
+            'keys':['from','to','weight','color'],
+            'nodes': nodeColors,
             'data': data,
             'type':'sankey',
         }]
     }
     
+
+
+    #return JsonResponse({'data':'none'})
     return JsonResponse(chart)
 
-def comparison_chart_category_data(request,category,date):
-    print(category)
+def comparison_chart_category_data(request,cat,date):
+    print("THIS IS THE DATE", date)
+
     
-    dateNow = datetime.now()
-    currentMonth = int(date[:2])
-    currentYear = int(date[3:7])
+    if date == None:
+        dateNow = datetime.now()
+        currentYear = dateNow.year
+        currentMonth = dateNow.month
+    else:
+        currentMonth = int(date[:2])
+        currentYear = int(date[3:7])
     
     categorySum = expenseReport.objects.values("date","title","value"
                     ).filter(
                         date__year=currentYear, date__month=currentMonth
                     ).filter(
-                        expenseChoices=str(category))
+                        category=str(cat)) or 0
                     
     return JsonResponse(list(categorySum), safe=False)
 
 def expense_comparison_barchart(request):
+
     newSet = list(BudgetCategory.objects.all())
+    for i in range(len(newSet)):
+        newSet[i] = newSet[i].name
     try:
         newSet.remove("Income")
     except ValueError:
         print("no income reported")
     
-    print(newSet)
-    
     #gets the date input from the user
     fromDate = request.session.get("date") #on first start this has no value, need to chaange this to a try statement
-    fromDate = fromDate.split("-")
-    fromYear = fromDate[0].strip('"')
-    fromMonth = fromDate[1]
-    fromDay = fromDate[2].strip('"')
-    
-    #get toDate
-    toDate = request.session.get("toDate")
-    toDate = toDate.split("-")
-    toYear = toDate[0].strip('"')
-    toMonth = toDate[1]
-    toDay = toDate[2].strip('"')
+   
+        #get current dates
+    dateNow = datetime.now()
+    currentYear = dateNow.year
+    currentMonth = dateNow.month
+   
+    if fromDate == None:
+        print("Argggggggg")
+        date_now = datetime.now()
+        currentYear = date_now.year
+        currentMonth = date_now.month
+        currentDay = date_now.day
+        
+        month_list = period_range(start=f"{currentYear}-{currentMonth}-01", end=f"{currentYear}-{currentMonth}-{currentDay}", freq='M')
+        month_list = [month.strftime("%m-%Y") for month in month_list]
+        categoryLabelList = month_list
+   
+    else:
+        fromDate = fromDate.split("-")
+        fromYear = fromDate[0].strip('"')
+        fromMonth = fromDate[1]
+        fromDay = fromDate[2].strip('"')
+        
+        #get toDate
+        toDate = request.session.get("toDate")
+        toDate = toDate.split("-")
+        toYear = toDate[0].strip('"')
+        toMonth = toDate[1]
+        toDay = toDate[2].strip('"')
+        
+            #get list of months from range input
+        month_list = period_range(start=f"{fromYear}-{fromMonth}-{fromDay}", end=f"{toYear}-{toMonth}-{toDay}", freq='M')
+        month_list = [month.strftime("%m-%Y") for month in month_list]
+        categoryLabelList = month_list
     
     #get category
     filterCategory = request.session.get("expenseLabelCategory")
@@ -462,10 +467,6 @@ def expense_comparison_barchart(request):
         "series":[]
     }
      
-    #get list of months from range input
-    month_list = period_range(start=f"{fromYear}-{fromMonth}-{fromDay}", end=f"{toYear}-{toMonth}-{toDay}", freq='M')
-    month_list = [month.strftime("%m-%Y") for month in month_list]
-    categoryLabelList = month_list
     data['categories'] = categoryLabelList
     
     #do something if only one category is requested
@@ -489,6 +490,7 @@ def expense_comparison_barchart(request):
         listOfDataSum = []
             
         #for each month
+        print(month_list)
         for d in month_list:
             
     #get the sum of the category and store in a list        
@@ -496,12 +498,12 @@ def expense_comparison_barchart(request):
                     ).filter(
                         date__year=d[3:], date__month=d[:2]
                     ).filter(
-                        expenseChoices=str(filterCategory)).aggregate(
-                    Sum('value'))['value__sum']
+                        category=str(filterCategory)).aggregate(
+                    Sum('value'))['value__sum'] or 0
             
             if dataSum == None:
                 dataSum = 0.0
-                        
+            print(dataSum)
             listOfDataSum.append(float(dataSum))
             
         #compute average of sums of categories    

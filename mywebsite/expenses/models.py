@@ -24,7 +24,7 @@ class expenseReport(models.Model):
     #see forms for more details
     date = models.DateField(default=now)
     title = models.CharField(max_length=128)
-    category = models.ForeignKey('''BudgetCategory''', on_delete=models.CASCADE,  default=get_or_create_default_category, related_name='expense_reports')
+    category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE,   related_name='expense_reports')
     value = models.DecimalField(decimal_places=2, max_digits=1000)
     note = models.TextField(max_length=140)
 
