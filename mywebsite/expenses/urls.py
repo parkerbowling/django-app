@@ -20,5 +20,7 @@ urlpatterns = [
     path('budget/save/', views.save_budget_category_view, name='save_budget_category'),
     path('budget/edit/<int:category_id>/', views.edit_category_view, name='edit_category'),
     path('budget/delete/<int:category_id>/', views.delete_category_view, name='delete_category'),
+    path('budget/edit/save/<int:category_id>/',views.save_budget_category_view,name='save_budget_category_view'),
+    
     
 ]

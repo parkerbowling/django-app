@@ -16,8 +16,8 @@ class BudgetCategory(models.Model):
 
 def get_or_create_default_category():
     category, created = BudgetCategory.objects.get_or_create(name='Miscellaneous')
-    category_data = {'name': category.name, 'value': str(category.value)}
-    return category_data
+    #category_data = {'name': category.name, 'value': str(category.value)}
+    return category
 
 #See forms.py for more details
 class expenseReport(models.Model):    

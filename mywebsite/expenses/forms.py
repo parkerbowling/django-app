@@ -120,5 +120,9 @@ class BudgetCategoryForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),  # Add any additional attributes or classes
             'value': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
         }
-        
-''''''
+    
+    def clean_value(self):
+        value = self.cleaned_data.get('value')
+        if value is not None and value <= 0:
+            raise forms.ValidationError("Value must be a positive number.")
+        return value

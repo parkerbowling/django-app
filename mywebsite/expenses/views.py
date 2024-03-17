@@ -86,7 +86,42 @@ def budget_modal_view(request):
     print(categories)
     return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
 
+def save_budget_category_view(request, category_id):
+    print("THIS IS THE CATEGORY ID: ", category_id)
+    if request.method == 'POST':
+        # Process POST request
+        form = BudgetCategoryForm(request.POST)
+        if form.is_valid():
+            # Retrieve the category instance based on the provided category ID
+            category = get_object_or_404(BudgetCategory, id=category_id)
+
+            # Update the category instance with the submitted form data
+            category.name = form.cleaned_data['name']
+            print("CATEGORY NAME AND VALUE",category.name,category.value)
+            category.value = form.cleaned_data['value']
+            # Update other fields as needed
+
+            # Save the changes to the category
+            category.save()
+
+            # Return a success JSON response
+            return JsonResponse({'success': True})
+        else:
+            # Return a JSON response with form errors
+            return JsonResponse({'errors': form.errors}, status=400)
+    elif request.method == 'GET':
+        # Handle GET request to render the form
+        category = get_object_or_404(BudgetCategory, id=category_id)
+        print("IN GET REQUEST, CATEGORY ",category)
+        form = BudgetCategoryForm(instance=category)  # Populate form with existing category data
+        print("THIS IS THE FORM",form)
+        return render(request, 'edit_budget_category_form.html', {'form': form})
+    else:
+        # Handle other HTTP methods (e.g., PUT, DELETE)
+        return JsonResponse({'error': 'Method Not Allowed'}, status=405)
+
 def save_budget_category_view(request):
+    print("the POST!",request.POST)
     if request.method == 'POST':
         form = BudgetCategoryForm(request.POST)
         if form.is_valid():
@@ -97,29 +132,31 @@ def save_budget_category_view(request):
     else:
         # For GET requests, return an empty form
         form = BudgetCategoryForm()
-        return render(request, 'budget_modal_form.html', {'form': form})
+        return render(request, 'budget_modal.html', {'form': form})
 
-def edit_category_view(request, category_id):
-    category = get_object_or_404(BudgetCategory, id=category_id)
-    print(category)
-    print("we are in the edit function")
+def edit_category_view(request, category_id=None):
+    print("CATEGORY ID",category_id)
+    if category_id:
+        # Retrieve the existing instance if category_id is provided
+        category = get_object_or_404(BudgetCategory, id=category_id)
+    else:
+        category = None
 
-    print(request.POST)
     if request.method == 'POST':
-        print("in the post")
+        # Handle form submission
         form = BudgetCategoryForm(request.POST, instance=category)
         if form.is_valid():
-            print("FORM IS VALID!")
             form.save()
-            # Serialize the category and send it as JSON
-            serialized_category = serialize('json', [category])
-            return JsonResponse({'success': True, 'category': serialized_category})
+            return JsonResponse({'success': True})
         else:
-            print("in the else statement")
-            print(form.errors)
-            return JsonResponse({'error': form.errors}, status=400)
-
-    return render(request, 'edit_budget_category_form.html', {'form': BudgetCategoryForm(instance=category)})
+            return JsonResponse({'errors': form.errors}, status=400)
+    else:
+        print("in the GET")
+        # Render the form with existing instance data or empty form
+        form = BudgetCategoryForm(instance=category)
+        print("this is the id of the category",category.id)
+        print(form)
+        return render(request, 'edit_budget_category_form.html', {'form': form, 'category': category})
 
 def delete_category_view(request, category_id):
     # Retrieve the instance of BudgetCategory or return a 404 response

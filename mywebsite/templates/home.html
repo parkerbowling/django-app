@@ -21,14 +21,50 @@
 
         <script>
             // Async function to load edit form content
-            async function editCategory(categoryId) {
+            async function editCategory(category_id) {
+                console.log("INSIDE THE EDITCATGORY ASYNC");
+                console.log(category_id)
                 try {
-                    const response = await fetch(`/expenses/budget/edit/${categoryId}/`);
+                    const response = await fetch(`/expenses/budget/edit/${category_id}/`, {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    });
                     const data = await response.text();
-
+                    console.log(data);
+                    console.log("past the fetch call");
+                    
                     // Inject the retrieved content into the editCategoryModalBody
                     $('#modalBodyContent').html(data);
                     $('#budgetModal').modal('show');
+            
+                    // Handle form submission when the form is submitted
+                    $('#editBudgetForm').submit(async function(event) {
+                        event.preventDefault(); // Prevent the default form submission behavior
+            
+                        try {
+                            const formData = new FormData(this); // Get form data
+            
+                            const response = await fetch($(this).attr('action'), {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token if needed
+                                }
+                            });
+            
+                            if (response.ok) {
+                                console.log('Edit categories form submitted successfully');
+                                // Optionally, you can reload the page or update UI as needed
+                            } else {
+                                console.error('Edit categories form submission failed:', response.statusText);
+                                // Optionally, you can display an error message to the user
+                            }
+                        } catch (error) {
+                            console.error('Error submitting edit categories form:', error);
+                        }
+                    });
                 } catch (error) {
                     console.error('Error editing category:', error);
                 }
