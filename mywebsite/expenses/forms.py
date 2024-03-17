@@ -119,6 +119,7 @@ class BudgetCategoryForm(forms.ModelForm):
         widgets = {
             'name': forms.TextInput(attrs={'class': 'form-control'}),  # Add any additional attributes or classes
             'value': forms.NumberInput(attrs={'class': 'form-control', 'step': 'any'}),
+            #'cashBack': forms.DecimalField(attrs={'class': 'form-control'})
         }
     
     def clean_value(self):

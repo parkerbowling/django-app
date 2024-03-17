@@ -9,10 +9,10 @@
                 </button>
             </div>
             <div class="modal-body" id="modalBodyContent">
-                <p>where are youuuuuu</p>
-                <div>
-                    <p>Hello, this is a test.</p>
-                </div>
+
+                <!-- Add a message element to display success message -->
+                <div id="success-message" style="display: none;"></div> 
+
                 <!-- Add new category section -->
             <div id="addCategorySection">
                 <form method="post" id="budgetForm" action="{% url 'expenses:save_budget_category' %}">

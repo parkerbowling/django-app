@@ -82,12 +82,9 @@ def budget_modal_view(request):
         if i.name == "Income":
             categories.remove(i)
     form = BudgetCategoryForm()
-    print("in the budget modal view")
-    print(categories)
     return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
 
 def save_budget_category_view(request, category_id):
-    print("THIS IS THE CATEGORY ID: ", category_id)
     if request.method == 'POST':
         # Process POST request
         form = BudgetCategoryForm(request.POST)
@@ -112,16 +109,13 @@ def save_budget_category_view(request, category_id):
     elif request.method == 'GET':
         # Handle GET request to render the form
         category = get_object_or_404(BudgetCategory, id=category_id)
-        print("IN GET REQUEST, CATEGORY ",category)
         form = BudgetCategoryForm(instance=category)  # Populate form with existing category data
-        print("THIS IS THE FORM",form)
         return render(request, 'edit_budget_category_form.html', {'form': form})
     else:
         # Handle other HTTP methods (e.g., PUT, DELETE)
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
 def save_budget_category_view(request):
-    print("the POST!",request.POST)
     if request.method == 'POST':
         form = BudgetCategoryForm(request.POST)
         if form.is_valid():
@@ -135,7 +129,6 @@ def save_budget_category_view(request):
         return render(request, 'budget_modal.html', {'form': form})
 
 def edit_category_view(request, category_id=None):
-    print("CATEGORY ID",category_id)
     if category_id:
         # Retrieve the existing instance if category_id is provided
         category = get_object_or_404(BudgetCategory, id=category_id)
@@ -151,11 +144,8 @@ def edit_category_view(request, category_id=None):
         else:
             return JsonResponse({'errors': form.errors}, status=400)
     else:
-        print("in the GET")
         # Render the form with existing instance data or empty form
         form = BudgetCategoryForm(instance=category)
-        print("this is the id of the category",category.id)
-        print(form)
         return render(request, 'edit_budget_category_form.html', {'form': form, 'category': category})
 
 def delete_category_view(request, category_id):
@@ -186,7 +176,6 @@ def expense_home(request):
         
         
         if formFilter.is_valid():
-            print("the form was valid!!!")
             #get data from cleaned, valid form
             
             form_data = formFilter.cleaned_data
@@ -449,7 +438,6 @@ def comparison_chart_category_data(request,category,date):
                     ).filter(
                         category__name=str(category)) #or 0
                     
-    print(categorySum)
     return JsonResponse(list(categorySum), safe=False)
 
 def expense_comparison_barchart(request):
@@ -475,7 +463,6 @@ def expense_comparison_barchart(request):
         currentYear = date_now.year
         currentMonth = date_now.month
         currentDay = date_now.day
-        print(currentDay)
         
         month_list = period_range(start=f"{currentYear}-{currentMonth}-01", end=f"{currentYear}-{currentMonth}-{currentDay}", freq='M')
         month_list = [month.strftime("%m-%Y") for month in month_list]
@@ -537,8 +524,8 @@ def expense_comparison_barchart(request):
             'data': []
         }   
         
-        listOfDataSum = []
-            
+        listOfDataSum = [] 
+        
         #for each month
         for d in month_list:
             
@@ -552,7 +539,6 @@ def expense_comparison_barchart(request):
             
             if dataSum == None:
                 dataSum = 0.0
-            print(dataSum)
             listOfDataSum.append(float(dataSum))
             
         #compute average of sums of categories    
@@ -592,16 +578,6 @@ def expense_comparison_barchart(request):
             }
             
             listOfDataSum = []
-
-       # savingsList = h.getAllExpenses_SavingsInMonthRange(month_list)
-        
-###############################################
-    
-    # #gets replaced by newSet
-    # listOfExpenseCategories = getExpenseCategories()
-    # listOfExpenseCategories.remove("INCOME")
-
-    # listOfDataSum = []
         
     #for each month
         for d in month_list:
@@ -719,6 +695,6 @@ def expense_comparison_barchart(request):
             listoftotalexpenses.append(totalPerMonth)
         
         data['series'] = seriesData
-        #print(listoftotalexpenses)
+
     return JsonResponse(data, safe=False)
     
