@@ -77,11 +77,16 @@ class DateInput(forms.DateInput):
 
 class expenseComparison(forms.Form):
     
-    date = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
+    date = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}",label="From:")
     
-    toDate = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}")
+    toDate = forms.DateField(widget=DateInput,initial=f"{datetime.today().year}-{datetime.today().month}-{datetime.today().day}",label="To:")
     
-    expenseLabelCategory = forms.ChoiceField(choices=[BudgetCategory.objects.all()],label="Category",required=False,initial="INCOME")
+    #expenseLabelCategory = forms.ChoiceField(choices=[BudgetCategory.objects.all()],label="Category",required=False,initial="INCOME")
+    expenseLabelCategory = forms.ModelChoiceField(
+        widget=forms.Select(attrs={'class': 'your-class-name'}),
+        queryset=BudgetCategory.objects.all(),  # Specify the queryset for ExpenseCategory
+        label="Expense Category"
+    )
     
     checkbox = forms.BooleanField(label='Aggregate', required=False, widget=forms.CheckboxInput)
     

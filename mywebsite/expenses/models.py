@@ -16,7 +16,8 @@ class BudgetCategory(models.Model):
 
 def get_or_create_default_category():
     category, created = BudgetCategory.objects.get_or_create(name='Miscellaneous')
-    return category
+    category_data = {'name': category.name, 'value': str(category.value)}
+    return category_data
 
 #See forms.py for more details
 class expenseReport(models.Model):    
@@ -31,39 +32,5 @@ class expenseReport(models.Model):
     def __str__(self):
         return self.title
     
-#    RENT_MORTAGAGE = 'RENT_MORTGAGE'
-    # GAS_TRANSIT = 'GAS_TRANSIT'
-    # INCOME = 'INCOME'
-    # TAXES = 'TAXES'
-    # UTILITIES = 'UTILITIES'
-    # GROCERIES = 'GROCERIES'
-    # DINE_OUT = 'DINE_OUT'
-    # ENTERTAINMENT = 'ENTERTAINMENT'
-    # TRAVEL = 'TRAVEL'
-    # SHOPPING = 'SHOPPING'
-    # REPAIRS = 'REPAIRS'
-    # HEALTHCARE = 'HEALTHCARE'
-    # GIVING = 'GIVING'
-    # SELF_CARE = 'SELF_CARE'
-    # INVESTING = 'INVESTING'
-    # MISCELLANEOUS = 'MISCELLANEOUS'
 
-    # EXPENSE_CHOICES = (
-    #     (RENT_MORTAGAGE,'Rent/Mortgage'),
-    #     (GAS_TRANSIT, 'Gas/Transit'),
-    #     (INCOME, 'Income'),
-    #     (TAXES, 'Taxes'),
-    #     (UTILITIES, 'Utilites'),
-    #     (GROCERIES, 'Groceries'),
-    #     (DINE_OUT, 'Dine Out'),
-    #     (ENTERTAINMENT, 'Entertainment'),
-    #     (TRAVEL, 'Travel'),
-    #     (SHOPPING, 'Shopping'),
-    #     (REPAIRS, 'Repairs'),
-    #     (HEALTHCARE, 'Healthcare'),    
-    #     (GIVING,'Giving'),
-    #     (SELF_CARE,'Self Care'),
-    #     (INVESTING,'Investing'),
-    #     (MISCELLANEOUS, 'Miscellaneous')
-    # )
     

@@ -15,16 +15,14 @@ from numpy import average as avg
 #temporary home page for now
 def home(request):
     #render takes in a request and an HTML page to render to view
-    
-
-    
     return render(request, 'home.html')
 
 
 def budget_chart_data(request):
     budget_categories = list(BudgetCategory.objects.all())
-    print(budget_categories)
-    print(budget_categories[0].value)
+    for i in budget_categories:
+        if i.name == "Income":
+            budget_categories.remove(i)
     date_now = datetime.now()
     current_year = date_now.year
     current_month = date_now.month
@@ -33,6 +31,10 @@ def budget_chart_data(request):
     data_of_expenses = []
 
     for cat in budget_categories:
+        
+        if cat == "Income":
+            continue
+        
         category_sum = expenseReport.objects.values("value").filter(
             date__year=current_year, date__month=current_month
         ).filter(
@@ -55,11 +57,9 @@ def budget_chart_data(request):
     except TypeError:
         print("There are null values, oh no!")
         budget_values = []
-    print("Theses are the budget_values before json serialized: ",budget_values)
     
     # Convert budget_values to a JSON-serializable list
     budget_values_json = list(map(float, budget_values))
-    print("These are the values after: ",budget_values_json)
 
     final_data = {
         'categories': [category.name for category in budget_categories],
@@ -76,15 +76,15 @@ def budget_chart_data(request):
 ##############################  
 
 def budget_modal_view(request):
-    categories = BudgetCategory.objects.all()
+    #categories = BudgetCategory.objects.all()
+    categories = list(BudgetCategory.objects.all())
+    for i in categories:
+        if i.name == "Income":
+            categories.remove(i)
     form = BudgetCategoryForm()
     print("in the budget modal view")
+    print(categories)
     return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
-
-def debug(request):
-    categories = BudgetCategory.objects.all()
-    form = BudgetCategoryForm()
-    return render(request, 'delete_budget_category_form.html', {'form': form})
 
 def save_budget_category_view(request):
     if request.method == 'POST':
@@ -101,15 +101,22 @@ def save_budget_category_view(request):
 
 def edit_category_view(request, category_id):
     category = get_object_or_404(BudgetCategory, id=category_id)
+    print(category)
+    print("we are in the edit function")
 
+    print(request.POST)
     if request.method == 'POST':
+        print("in the post")
         form = BudgetCategoryForm(request.POST, instance=category)
         if form.is_valid():
+            print("FORM IS VALID!")
             form.save()
             # Serialize the category and send it as JSON
             serialized_category = serialize('json', [category])
             return JsonResponse({'success': True, 'category': serialized_category})
         else:
+            print("in the else statement")
+            print(form.errors)
             return JsonResponse({'error': form.errors}, status=400)
 
     return render(request, 'edit_budget_category_form.html', {'form': BudgetCategoryForm(instance=category)})
@@ -140,24 +147,31 @@ def expense_home(request):
         #get date on a POST
         formFilter = expenseComparison(request.POST)
         
+        
         if formFilter.is_valid():
-
+            print("the form was valid!!!")
             #get data from cleaned, valid form
-            fromDateData = formFilter.cleaned_data['date']
-            toDateData = formFilter.cleaned_data['toDate']
-            categoryFilterData = formFilter.cleaned_data['expenseLabelCategory'] 
+            
+            form_data = formFilter.cleaned_data
+            
+            category_name = form_data['expenseLabelCategory'].name if form_data['expenseLabelCategory'] else None
+
+            # Serialize form data to JSON
+            serialized_data = {
+                'date': form_data['date'].strftime('%Y-%m-%d'),
+                'toDate': form_data['toDate'].strftime('%Y-%m-%d'),
+                'expenseLabelCategory': category_name,
+                'checkbox': form_data['checkbox'],
+            }
                         
             #From date data
-            obj = json.dumps(fromDateData, indent=4, sort_keys=True, default=str)
-            request.session['date'] = obj  #formFilter.cleaned_data['date']
+            request.session['date'] = serialized_data['date']    #obj
 
             #To date data
-            obj1 = json.dumps(toDateData, indent=4, sort_keys=True, default=str)
-            request.session['toDate'] = obj1
+            request.session['toDate'] = serialized_data['toDate']   #obj1
             
             #filter category
-            obj2 = categoryFilterData
-            request.session['expenseLabelCategory'] = obj2
+            request.session['expenseLabelCategory'] = serialized_data['expenseLabelCategory'] #obj2
             
     
     context = {
@@ -186,7 +200,6 @@ def add_expense(request):
     return render(request, 'add_expense.html', context)
 
 def pie_chart_category_data(request, category):
-    print(category)
     
     dateNow = datetime.now()
     currentYear = dateNow.year
@@ -383,9 +396,7 @@ def expense_sankeychart(request):
     #return JsonResponse({'data':'none'})
     return JsonResponse(chart)
 
-def comparison_chart_category_data(request,cat,date):
-    print("THIS IS THE DATE", date)
-
+def comparison_chart_category_data(request,category,date):
     
     if date == None:
         dateNow = datetime.now()
@@ -399,8 +410,9 @@ def comparison_chart_category_data(request,cat,date):
                     ).filter(
                         date__year=currentYear, date__month=currentMonth
                     ).filter(
-                        category=str(cat)) or 0
+                        category__name=str(category)) #or 0
                     
+    print(categorySum)
     return JsonResponse(list(categorySum), safe=False)
 
 def expense_comparison_barchart(request):
@@ -422,11 +434,11 @@ def expense_comparison_barchart(request):
     currentMonth = dateNow.month
    
     if fromDate == None:
-        print("Argggggggg")
         date_now = datetime.now()
         currentYear = date_now.year
         currentMonth = date_now.month
         currentDay = date_now.day
+        print(currentDay)
         
         month_list = period_range(start=f"{currentYear}-{currentMonth}-01", end=f"{currentYear}-{currentMonth}-{currentDay}", freq='M')
         month_list = [month.strftime("%m-%Y") for month in month_list]
@@ -452,7 +464,8 @@ def expense_comparison_barchart(request):
     
     #get category
     filterCategory = request.session.get("expenseLabelCategory")
- 
+    if filterCategory == None:
+        filterCategory = "Income"
     
     #check checkbox value
     checkbox = request.session.get("checkbox")
@@ -490,15 +503,14 @@ def expense_comparison_barchart(request):
         listOfDataSum = []
             
         #for each month
-        print(month_list)
         for d in month_list:
             
-    #get the sum of the category and store in a list        
+            #get the sum of the category and store in a list        
             dataSum = expenseReport.objects.values("value"
                     ).filter(
                         date__year=d[3:], date__month=d[:2]
                     ).filter(
-                        category=str(filterCategory)).aggregate(
+                        category__name=str(filterCategory)).aggregate(
                     Sum('value'))['value__sum'] or 0
             
             if dataSum == None:
@@ -544,8 +556,58 @@ def expense_comparison_barchart(request):
             
             listOfDataSum = []
 
-        savingsList = h.getAllExpenses_SavingsInMonthRange(month_list)
+       # savingsList = h.getAllExpenses_SavingsInMonthRange(month_list)
+        
+###############################################
+    
+    # #gets replaced by newSet
+    # listOfExpenseCategories = getExpenseCategories()
+    # listOfExpenseCategories.remove("INCOME")
+
+    # listOfDataSum = []
+        
+    #for each month
+        for d in month_list:
             
+            totalExpenses = 0
+            
+            for e in newSet:
+                    
+        #       get the sum of the category and store in a list        
+                dataSum = expenseReport.objects.values("value"
+                        ).filter(
+                            date__year=d[3:], date__month=d[:2]
+                        ).filter(
+                            category__name=str(e)).aggregate(
+                        Sum('value'))['value__sum']
+                
+                if dataSum == None:
+                    dataSum = 0.0
+                    
+                totalExpenses += float(dataSum)
+                
+            totalSavings = totalExpenses
+                    
+            incomeBal = expenseReport.objects.values("value"
+                    ).filter(
+                        date__year=d[3:], date__month=d[:2]
+                    ).filter(
+                        category__name=str("Income")).aggregate(
+                    Sum('value'))['value__sum'] or 0
+        
+            
+            #savings = income - expenses
+            totalSavings = float(incomeBal) - float(totalSavings)
+            
+            listOfDataSum.append(totalSavings)
+        
+        for i in range(len(listOfDataSum)):
+            listOfDataSum[i] = round(listOfDataSum[i],2)
+        
+        savingsList = listOfDataSum
+        
+################################################
+                
         bar['data'] = savingsList
         seriesData.append(bar)
         average['data'] = [avg(savingsList) for i in range(len(savingsList))]
@@ -581,7 +643,7 @@ def expense_comparison_barchart(request):
                         ).filter(
                             date__year=d[3:], date__month=d[:2]
                         ).filter(
-                            expenseChoices=str(c)).aggregate(
+                            categroy__name=str(c)).aggregate(
                         Sum('value'))['value__sum']
                 
                 if dataSum == None:
@@ -607,7 +669,7 @@ def expense_comparison_barchart(request):
                     ).filter(
                         date__year=d[3:], date__month=d[:2]
                     ).filter(
-                        expenseChoices=str(c)).aggregate(
+                        category__name=str(c)).aggregate(
                     Sum('value'))['value__sum']
             
                 if dataSum == None:

@@ -38,6 +38,7 @@
             async function handleSubmission(formId, modalId) {
                 try {
                     const form = $(`#${formId}`);
+                    console.log(`Selected form element: ${formId}`, form);
                     const formData = new FormData(form[0]);
             
                     const response = await fetch(form.attr('action'), {
@@ -47,7 +48,6 @@
             
                     if (response.ok) {
                         // Success: reload the modal or update its content
-                        console.log(formData);
                         const modal = $(`#${modalId}`);
                         const modalBody = modal.find('.modal-body');
             
@@ -55,7 +55,7 @@
                         await loadModalContent(modalBody);
             
                         // Optionally, hide the modal if desired
-                        modal.modal('hide');
+                        //modal.modal('hide');
                     } else {
                         // Error: handle the error case
                         console.error('Form submission failed:', response.statusText);
@@ -68,7 +68,6 @@
             async function deleteCategory(categoryId) {
                 try {
                     // Perform an AJAX request to delete the category
-                    console.log(categoryId)
                     const response = await fetch(`/expenses/budget/delete/${categoryId}/`, {
                         method: 'POST',
                         headers: {

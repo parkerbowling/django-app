@@ -81,8 +81,7 @@
               try {
                 const response = await fetch('/pie-chart-category-data/' + category + '/'); // Replace with your endpoint
                 const data = await response.json();
-                console.log("does this work for both");
-                console.log(data)
+
                 displayCategoryDataInModal(category, data);
               } catch (error) {
                 console.error('Error fetching pie chart data:', error);
@@ -138,8 +137,7 @@
                 
               const chartTitle = pieChartData.title; // Extracting the title
               const seriesData = pieChartData.data;
-    
-              console.log(seriesData)
+  
 
               Highcharts.chart('expenses-pie-container', {
                 chart: {
@@ -203,7 +201,7 @@
   <div class="column" name="expense_comparison_barchart" display="inline">
         <form action='.' method='POST' name="barchart-monthyear-filter" id="filterComparison"> 
             {% csrf_token %}
-            {% comment %} {{ form.as_p }} {% endcomment %}
+            {{ form.as_p }} 
             <input type="submit" value="Save"/>
             <ul class="messages">
                 {% for message in messages %}
@@ -281,11 +279,13 @@
             if (category == "Average" || category == "Savings") {
               return
             }
+
             const response = await fetch('/comparison-chart-category-data/' + category + '/' + date + '/'); // Replace with your endpoint
             const data = await response.json();
+
             displayCategoryDataInComparisonModal(category, data);
           } catch (error) {
-            console.error('Error fetching pie chart data:', error);
+            console.error('Error fetching comparisonChartData chart data:', error);
           }
         } 
 
@@ -377,7 +377,6 @@
                       // Display the modal with data for the clicked category
                       const clickedCategory = this.series.name;
                       const clickedDate = this.category;
-                      console.log(this.category);
                       const categoryData = await fetchCategoryComparisonData(clickedCategory,clickedDate);
 
                     }
