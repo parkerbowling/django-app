@@ -2,8 +2,233 @@
 
 {% block title %}
     <title>Dashboard</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+
+    <!-- jQuery, Popper.js, and Bootstrap JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
 {% endblock title %}
  
 {% block body_content %}
     <p>This is the home page</p>
+    <div id="edit-category-button">
+        <button type="button" class="btn btn-primary" onclick="loadModalContent()">
+            Edit Categories
+        </button>
+
+        <!-- Add a message element to display success message -->
+
+        <script>
+        // Function to show success message with countdown
+        function showSuccessMessageWithCountdownAndCloseModal(message, modalId) {
+            const successMessage = document.getElementById('success-message');
+            successMessage.textContent = message; // Set the success message
+            successMessage.style.display = 'block'; // Show the success message
+        
+            let secondsLeft = 1; // Countdown duration in seconds
+            const countdownElement = document.createElement('span');
+        
+            const countdownInterval = setInterval(() => {
+                secondsLeft--; // Decrement seconds
+        
+                if (secondsLeft <= 0) {
+                    clearInterval(countdownInterval); // Stop countdown
+                    $(`#${modalId}`).modal('hide'); // Close the modal
+                    window.location.reload(); // Reload the page
+                }
+            }, 1000); // Update countdown every second
+        }
+
+        </script>
+
+        <script>
+            // Async function to load edit form content
+            async function editCategory(category_id) {
+                try {
+                    const response = await fetch(`/expenses/budget/edit/${category_id}/`, {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    });
+                    const data = await response.text();
+                    
+                    // Inject the retrieved content into the editCategoryModalBody
+                    $('#modalBodyContent').html(data);
+                    $('#budgetModal').modal('show');
+            
+                    // Handle form submission when the form is submitted
+                    $('#editBudgetForm').submit(async function(event) {
+                        event.preventDefault(); // Prevent the default form submission behavior
+            
+                        try {
+                            const formData = new FormData(this); // Get form data
+            
+                            const response = await fetch($(this).attr('action'), {
+                                method: 'POST',
+                                body: formData,
+                                headers: {
+                                    'X-CSRFToken': getCookie('csrftoken') // Include CSRF token if needed
+                                }
+                            });
+            
+                            if (response.ok) {
+                                console.log('Edit categories form submitted successfully');
+                                window.location.reload();
+                                // Optionally, you can reload the page or update UI as needed
+                            } else {
+                                console.error('Edit categories form submission failed:', response.statusText);
+                                // Optionally, you can display an error message to the user
+                            }
+                        } catch (error) {
+                            console.error('Error submitting edit categories form:', error);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Error editing category:', error);
+                }
+            }
+
+            // Function to handle form submission
+            async function handleSubmission(formId, modalId) {
+                try {
+                    const form = $(`#${formId}`);
+                    const formData = new FormData(form[0]);
+            
+                    const response = await fetch(form.attr('action'), {
+                        method: 'POST',
+                        body: formData,
+                    });
+            
+                    if (response.ok) {
+                        // Success: reload the modal or update its content
+                        //window.location.reload();
+                        showSuccessMessageWithCountdownAndCloseModal("Added new category!", "budgetModal");
+            
+                        // Optionally, hide the modal if desired
+                        //modal.modal('hide');
+                    } else {
+                        // Error: handle the error case
+                        console.error('Form submission failed:', response.statusText);
+                    }
+                } catch (error) {
+                    console.error('Error handling form submission:', error);
+                }
+            }
+            
+            async function deleteCategory(categoryId) {
+                try {
+                    // Ask for confirmation before deleting
+                    const confirmDelete = window.confirm("Are you sure you want to delete this category?\nYou WILL lose all of your data in this expense category!");
+                    
+                    // If user confirms deletion
+                    if (confirmDelete) {
+                        // Perform an AJAX request to delete the category
+                        const response = await fetch(`/expenses/budget/delete/${categoryId}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            }
+                        });
+            
+                        if (response.ok) {
+                            // Handle success (e.g., refresh the page or update UI)
+                            //console.log('Category deleted successfully');
+                            showSuccessMessageWithCountdownAndCloseModal("Category deleted!", "budgetModal");
+                        } else {
+                            // Handle errors (e.g., display an error message)
+                            console.error('Error deleting category:', response.statusText);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                }
+            }
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Check if this cookie name matches the one we are looking for
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        
+            async function loadModalContent() {
+                try {
+                    const response = await fetch('/expenses/budget/modal/');
+                    const data = await response.text();
+                    // Append the modal content to the body
+                    $('body').append(data);
+                    // Show the modal
+                    $('#budgetModal').modal('show');
+                } catch (error) {
+                    console.error('Error loading modal content:', error);
+                }
+            }
+        </script>
+
+    </div>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <div id="budget-container">
+    <script>
+        async function fetchDataAndRenderChart() {
+            const response = await fetch('/budget-chart-data/');
+            const data = await response.json();
+        
+            Highcharts.chart('budget-container', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: data.title
+                },
+                xAxis: {
+                    categories: data.categories
+                },
+                yAxis: {
+                    title: {
+                        text: 'Dollars'
+                    }
+                    
+                },
+                plotOptions: {
+                    series: {
+                        grouping: false
+                    },
+                },
+                tooltip: {
+                    shared: true,
+                    formatter: function () {
+                        var diff = this.points[1].y - this.points[0].y;
+                        if (diff > 0) {
+                            var over = 'Over budget by:'
+                        } else {
+                            var over = 'Under budget by:'
+                        }
+                        return '<b>' + this.x + '</b><br/>' +
+                            this.points[0].series.name + ': ' + '$' + this.points[0].y + '<br/>' +
+                            this.points[1].series.name + ': ' + '$' + this.points[1].y + '<br/>' +
+                            over + ' $' + diff;
+                    }
+                },
+                series: data.series
+            });
+        }
+        
+        fetchDataAndRenderChart();
+        </script>
+    </div>
+
+
 {% endblock body_content %}

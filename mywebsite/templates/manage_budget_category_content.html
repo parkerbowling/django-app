@@ -1,0 +1,28 @@
+<!-- expenses/manage_budget_category_content.html -->
+<!-- Content for managing budget categories -->
+<div>
+    <h2>Edit Budget Categories</h2>
+    <ul>
+      {% for category in categories %}
+        <li>{{ category.name }}
+          <a href="{% url 'edit_budget_category' pk=category.pk %}" data-dismiss="modal">Edit</a>
+        </li>
+      {% endfor %}
+    </ul>
+  
+    <h2>Delete Budget Categories</h2>
+    <ul>
+      {% for category in categories %}
+        <li>{{ category.name }}
+          <a href="{% url 'delete_budget_category' pk=category.pk %}" data-dismiss="modal">Delete</a>
+        </li>
+      {% endfor %}
+    </ul>
+  
+    <h2>Add Budget Category</h2>
+    <form method="post" action="">  <!-- Use the correct URL pattern for form submission -->
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Add Category</button>
+    </form>
+  </div>

@@ -89,7 +89,7 @@ USER = os.environ.get('USER')
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
+        'NAME': 'developmentdb', #this needs to be postgres
         'USER': USER, 
         'PASSWORD': PASSWORD,
         'HOST':'localhost',
