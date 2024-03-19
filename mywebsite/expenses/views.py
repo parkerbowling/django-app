@@ -174,7 +174,6 @@ def expense_home(request):
         #get date on a POST
         formFilter = expenseComparison(request.POST)
         
-        
         if formFilter.is_valid():
             #get data from cleaned, valid form
             
@@ -198,7 +197,37 @@ def expense_home(request):
             
             #filter category
             request.session['expenseLabelCategory'] = serialized_data['expenseLabelCategory'] #obj2
+        
+        else:
             
+            form_data = formFilter.cleaned_data
+            
+            expense_label_category = request.POST.get('expenseLabelCategory', 'default_category')
+            
+            serialized_data = {
+                'date': form_data['date'].strftime('%Y-%m-%d'),
+                'toDate': form_data['toDate'].strftime('%Y-%m-%d'),
+                'expenseLabelCategory': expense_label_category,
+                'checkbox': form_data['checkbox'],
+            }
+                        
+            #From date data
+            request.session['date'] = serialized_data['date']    #obj
+
+            #To date data
+            request.session['toDate'] = serialized_data['toDate']   #obj1
+            
+            #filter category
+            request.session['expenseLabelCategory'] = serialized_data['expenseLabelCategory'] #obj2
+            
+    
+    extra_choices = [
+        ('Savings', 'Savings'),
+        ('All Expenses', 'All Expenses'),
+        # Add more extra choices as needed
+    ]
+    
+    formFilter.fields['expenseLabelCategory'].choices = list(formFilter.fields['expenseLabelCategory'].choices) + extra_choices
     
     context = {
         "form":formFilter
@@ -656,7 +685,7 @@ def expense_comparison_barchart(request):
                         ).filter(
                             date__year=d[3:], date__month=d[:2]
                         ).filter(
-                            categroy__name=str(c)).aggregate(
+                            category__name=str(c)).aggregate(
                         Sum('value'))['value__sum']
                 
                 if dataSum == None:

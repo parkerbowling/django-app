@@ -16,7 +16,7 @@ class BudgetCategory(models.Model):
         return self.name
 
 def get_or_create_default_category():
-    category, created = BudgetCategory.objects.get_or_create(name='Miscellaneous')
+    category, created = BudgetCategory.objects.get_or_create()
     #category_data = {'name': category.name, 'value': str(category.value)}
     return category
 
