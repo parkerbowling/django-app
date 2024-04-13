@@ -88,6 +88,9 @@ USER = os.environ.get('USER')
 
 LOGIN_URL = '/'
 
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Use database-backed sessions
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 #database definition
 DATABASES = {
     'default': {

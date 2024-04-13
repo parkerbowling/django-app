@@ -139,3 +139,14 @@ class BudgetCategoryForm(forms.ModelForm):
         if value is not None and value <= 0:
             raise forms.ValidationError("Value must be a positive number.")
         return value
+    
+    def __init__(self, user, *args, **kwargs):
+        self.user = user
+        super(BudgetCategoryForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super(BudgetCategoryForm, self).save(commit=False)
+        instance.user = self.user  # Set the user field
+        if commit:
+            instance.save()
+        return instance

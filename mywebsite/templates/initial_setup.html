@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+
+    <title>Initial Setup</title>
+{% endblock title %}
+
+{% block body_content %}
+
+<h1>Welcome to the Budget and Expense Tracker! Glad you're finally taking control of your finances. Let's add some budget categories for you to track. 
+    You'll be naming each category and giving it a budget value. Don't worry, you can change these at any time!</h1>
+    <!-- Add setup form or instructions here -->
+<h2>Add Budget Category</h2>
+<form method="post" action="{% url 'initial-setup' %}">  <!-- Use the correct URL pattern for form submission -->
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Add Category</button>
+</form>
+
+{% endblock body_content %}

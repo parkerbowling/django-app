@@ -79,7 +79,7 @@ def budget_modal_view(request):
     for i in categories:
         if i.name == "Income":
             categories.remove(i)
-    form = BudgetCategoryForm()
+    form = BudgetCategoryForm(request.user)
     return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
 
 @login_required

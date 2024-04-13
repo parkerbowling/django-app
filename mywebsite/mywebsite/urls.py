@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 # importing from app folder, the view file
 from expenses.views import *
-from auth_users.views import user_login
+from auth_users.views import user_login, initial_setup_view
 
 urlpatterns = [
     #name admin path
@@ -29,6 +29,7 @@ urlpatterns = [
     
     path('dashboard/', home, name="dashboard"),
     path('',user_login,name='login'),
+    path('initial-setup/',initial_setup_view,name='initial-setup'),
     
     # path('dashboard/', home, name="dashbaord"),
     # path('',login,name='login'),
