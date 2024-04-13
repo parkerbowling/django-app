@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     #added my apps 
     'expenses',
     'recipes',
+    'auth_users',
     #'chartGPT',
 ]
 
@@ -84,6 +85,8 @@ WSGI_APPLICATION = 'mywebsite.wsgi.application'
 
 PASSWORD = os.environ.get('PASSWORD')
 USER = os.environ.get('USER')
+
+LOGIN_URL = '/'
 
 #database definition
 DATABASES = {

@@ -64,6 +64,18 @@ class expenseReportForm(forms.ModelForm):
         required=False,
         label="Note"
     )
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)  # Retrieve user from keyword arguments
+        super(expenseReportForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super(expenseReportForm, self).save(commit=False)
+        if self.user:
+            instance.user = self.user  # Associate form data with the user
+        if commit:
+            instance.save()
+        return instance
 
     class Meta:
         model = expenseReport

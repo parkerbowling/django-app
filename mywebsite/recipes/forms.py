@@ -42,3 +42,15 @@ class recipesForm(forms.ModelForm):
     def get_absolute_url(self):
         return reverse("recipes:recipe_detail", kwargs={"id": self.id})
     
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)  # Retrieve user from keyword arguments
+        super(recipesForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super(recipesForm, self).save(commit=False)
+        if self.user:
+            instance.user = self.user  # Associate form data with the user
+        if commit:
+            instance.save()
+        return instance
+    

@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy, reverse
 from .forms import recipesForm
 from .models import recipesModel
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from django.views.generic import (
     CreateView,
@@ -10,7 +11,7 @@ from django.views.generic import (
     UpdateView
 )
 
-class RecipeListView(ListView):
+class RecipeListView(LoginRequiredMixin, ListView):
     template_name = "recipe_home.html"
     queryset = recipesModel.objects.all()
     context_object_name = 'filtered_results'
@@ -43,15 +44,25 @@ class RecipeListView(ListView):
     
         return result
     
-class RecipeDetailView(DetailView):
+    def get_form_kwargs(self):
+        kwargs = super(RecipeListView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user  # Pass authenticated user to the form
+        return kwargs
+    
+class RecipeDetailView(LoginRequiredMixin, DetailView):
     template_name = "recipe_detail.html"
     queryset = recipesModel.objects.all()
     
     def get_object(self):
         id_ = self.kwargs.get("id")
         return get_object_or_404(recipesModel,id=id_)
+    
+    def get_form_kwargs(self):
+        kwargs = super(RecipeDetailView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user  # Pass authenticated user to the form
+        return kwargs
             
-class RecipeAddView(CreateView):
+class RecipeAddView(LoginRequiredMixin, CreateView):
     template_name = "add_recipe.html"
     queryset = recipesModel.objects.all()
     form_class = recipesForm
@@ -60,8 +71,13 @@ class RecipeAddView(CreateView):
         print(form.cleaned_data) 
         return super().form_valid(form)
     
+    def get_form_kwargs(self):
+        kwargs = super(RecipeAddView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user  # Pass authenticated user to the form
+        return kwargs
+    
 #success_url does not work, not sure why but can fix later
-class RecipeUpdateView(UpdateView):
+class RecipeUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "update_recipe.html"
     form_class = recipesForm
     success_url = "/recipes/recipe_detail"
@@ -77,3 +93,8 @@ class RecipeUpdateView(UpdateView):
     
     def get_success_url(self):
         return reverse('recipes:recipe_detail',kwargs={'id': self.object.id })
+    
+    def get_form_kwargs(self):
+        kwargs = super(RecipeUpdateView, self).get_form_kwargs()
+        kwargs['user'] = self.request.user  # Pass authenticated user to the form
+        return kwargs

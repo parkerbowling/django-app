@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 # importing from app folder, the view file
 from expenses.views import *
-from auth_users.views import login_user
+from auth_users.views import user_login
 
 urlpatterns = [
     #name admin path
@@ -27,10 +27,13 @@ urlpatterns = [
     #name home path
     #path('home/', home, name="home"),
     
-    path('', home, name="home"),
+    path('dashboard/', home, name="dashboard"),
+    path('',user_login,name='login'),
     
-    #name a login path
-    #path('auth_users/',include('auth_users.urls')),
+    # path('dashboard/', home, name="dashbaord"),
+    # path('',login,name='login'),
+    
+
 
     #name expenses urls by including expenses namespace
     path('expenses/',include('expenses.urls',namespace='expenses')),
@@ -42,6 +45,7 @@ urlpatterns = [
     #name expenses urls by including recipes namespace
     path('budget-chart-data/',budget_chart_data,name="budget-chart-data"),
     path('recipes/',include('recipes.urls',namespace='recipes')),
+    path('auth_users/', include('auth_users.urls',namespace='auth_users')),
     
     #path('chartGPT/',include('chartGPT.urls',namespace='chartGPT')),
     

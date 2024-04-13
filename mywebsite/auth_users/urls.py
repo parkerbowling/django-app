@@ -2,8 +2,13 @@ from django.contrib import admin
 from django.urls import path, include
 from . import views
 
-urlpatterns = [
+app_name = 'auth_users'
 
-    path('login_user/',views.login_user, name=""),
+urlpatterns = [
+    
+    path('signup/', views.signup, name='signup'),
+    #path('login/', views.user_login, name='login'),
+    path('logout/', views.user_logout, name='logout'),
+    # Add URLs for password reset, etc.
 
 ]

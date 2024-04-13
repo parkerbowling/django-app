@@ -1,9 +1,14 @@
 <!DOCTYPE html>
 
-{% url 'home' as home %}
+{% url 'dashboard' as home %}
 {% url 'expenses:expense_home' as expense_home %}
 {% url 'recipes:recipe_home' as recipe_home %}
-{% comment %} {% url 'chartGPT:chartgpt_home' as chartgpt_home %} {% endcomment %}
+
+{% if user.is_authenticated %}
+    <a href="{% url 'auth_users:logout' %}">Logout</a>
+{% else %}
+{% endif %}
+
 
 <html lang="en">
 <head>
@@ -13,15 +18,17 @@
 </head>
 <body>
   {% block navbar %}
-  
+
+  {% if user.is_authenticated %}
   <nav>
     <div class="navbar">
       <a href="{{home}}">Home</a>
       <a href="{{expense_home}}">Expense Tracker</a>
       <a href="{{recipe_home}}">Recipe Database</a>
-      {% comment %} <a href="{{chartgpt_home}}">ChartGPT</a> {% endcomment %}
     </div>
   </nav> 
+  {% endif %}
+
   {% endblock navbar %}
 
   {% block body_content %}

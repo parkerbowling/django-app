@@ -2,24 +2,22 @@ from django.shortcuts import redirect, render, get_object_or_404
 from django.db.models import Sum
 from .models import expenseReport, BudgetCategory
 from .forms import expenseReportForm, expenseComparison, BudgetCategoryForm, ExpenseCategory
-from django.template.loader import render_to_string
-from django.core.serializers import serialize
 from django.contrib import messages
 from django.http import JsonResponse
 from datetime import datetime
-import json
-from . import helper as h
 from pandas import period_range
 from numpy import average as avg
+from django.contrib.auth.decorators import login_required
 
 #temporary home page for now
+@login_required
 def home(request):
     #render takes in a request and an HTML page to render to view
     return render(request, 'home.html')
 
-
+@login_required
 def budget_chart_data(request):
-    budget_categories = list(BudgetCategory.objects.all())
+    budget_categories = list(BudgetCategory.objects.filter(user=request.user))
     for i in budget_categories:
         if i.name == "Income":
             budget_categories.remove(i)
@@ -35,7 +33,7 @@ def budget_chart_data(request):
         if cat == "Income":
             continue
         
-        category_sum = expenseReport.objects.values("value").filter(
+        category_sum = expenseReport.objects.values("value").filter(user=request.user,
             date__year=current_year, date__month=current_month
         ).filter(
             category__name=str(cat)
@@ -74,7 +72,7 @@ def budget_chart_data(request):
     return JsonResponse(final_data)
    
 ##############################  
-
+@login_required
 def budget_modal_view(request):
     #categories = BudgetCategory.objects.all()
     categories = list(BudgetCategory.objects.all())
@@ -84,6 +82,7 @@ def budget_modal_view(request):
     form = BudgetCategoryForm()
     return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
 
+@login_required
 def save_budget_category_view(request, category_id):
     if request.method == 'POST':
         # Process POST request
@@ -115,6 +114,7 @@ def save_budget_category_view(request, category_id):
         # Handle other HTTP methods (e.g., PUT, DELETE)
         return JsonResponse({'error': 'Method Not Allowed'}, status=405)
 
+@login_required
 def save_budget_category_view(request):
     if request.method == 'POST':
         form = BudgetCategoryForm(request.POST)
@@ -128,6 +128,7 @@ def save_budget_category_view(request):
         form = BudgetCategoryForm()
         return render(request, 'budget_modal.html', {'form': form})
 
+@login_required
 def edit_category_view(request, category_id=None):
     if category_id:
         # Retrieve the existing instance if category_id is provided
@@ -148,6 +149,7 @@ def edit_category_view(request, category_id=None):
         form = BudgetCategoryForm(instance=category)
         return render(request, 'edit_budget_category_form.html', {'form': form, 'category': category})
 
+@login_required
 def delete_category_view(request, category_id):
     # Retrieve the instance of BudgetCategory or return a 404 response
     category = get_object_or_404(BudgetCategory, id=category_id)
@@ -162,7 +164,7 @@ def delete_category_view(request, category_id):
         return JsonResponse({'error': f'Delete failed: {str(e)}'}, status=500)
 
 #################################
-
+@login_required
 def expense_home(request):
     
     if request.method == "GET":
@@ -236,6 +238,7 @@ def expense_home(request):
     return render(request,'expense_home.html', context)
 
 #add_expense is the page where user can add expense
+@login_required
 def add_expense(request):
 
     #define a form to be used. Arguments POST it to the view if a POST is requested or post an empty form
@@ -254,6 +257,7 @@ def add_expense(request):
     }
     return render(request, 'add_expense.html', context)
 
+@login_required
 def pie_chart_category_data(request, category):
     
     dateNow = datetime.now()
@@ -262,12 +266,13 @@ def pie_chart_category_data(request, category):
     
     categorySum = expenseReport.objects.values("date","title","value"
                     ).filter(
-                        date__year=currentYear, date__month=currentMonth
+                        date__year=currentYear, date__month=currentMonth,user=request.user
                     ).filter(
                         category__name=str(category))
                     
     return JsonResponse(list(categorySum), safe=False)
 
+@login_required
 def pie_chart_data(request):
         #dynamically get the Categories in case I decide to add or remove one of them and make them unique
     newSet = list(BudgetCategory.objects.all())
@@ -298,9 +303,11 @@ def pie_chart_data(request):
         #gets all values for category and sums
         if True:
             categorySum = expenseReport.objects.values("value").filter(
-            date__year=currentYear, date__month=currentMonth
+            date__year=currentYear, date__month=currentMonth,user=request.user
             ).filter(
                 category__name=str(i)
+            ).filter(
+                user=request.user
             ).aggregate(
                 Sum('value')
             )['value__sum'] or 0
@@ -323,12 +330,14 @@ def pie_chart_data(request):
 #
 # Pie Chart
 #
+@login_required
 def expense_piechart(request):
     return
 
 #
 # Sankey Chart
 #
+@login_required
 def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
@@ -349,7 +358,7 @@ def expense_sankeychart(request):
     
     #get the income total
     incomeSum = expenseReport.objects.values("value").filter(
-            date__year=currentYear, date__month=currentMonth
+            date__year=currentYear, date__month=currentMonth,user=request.user
         ).filter(
             category__name=str("Income")
         ).aggregate(
@@ -366,7 +375,7 @@ def expense_sankeychart(request):
                        
     for i in newSet:
         categorySum = expenseReport.objects.values("value").filter(
-                date__year=currentYear, date__month=currentMonth
+                date__year=currentYear, date__month=currentMonth,user=request.user
             ).filter(
                 category__name=str(i)
             ).aggregate(
@@ -446,11 +455,10 @@ def expense_sankeychart(request):
         }]
     }
     
-
-
     #return JsonResponse({'data':'none'})
     return JsonResponse(chart)
 
+@login_required
 def comparison_chart_category_data(request,category,date):
     
     if date == None:
@@ -463,12 +471,13 @@ def comparison_chart_category_data(request,category,date):
     
     categorySum = expenseReport.objects.values("date","title","value"
                     ).filter(
-                        date__year=currentYear, date__month=currentMonth
+                        date__year=currentYear, date__month=currentMonth,user=request.user
                     ).filter(
                         category__name=str(category)) #or 0
                     
     return JsonResponse(list(categorySum), safe=False)
 
+@login_required
 def expense_comparison_barchart(request):
 
     newSet = list(BudgetCategory.objects.all())
@@ -561,7 +570,7 @@ def expense_comparison_barchart(request):
             #get the sum of the category and store in a list        
             dataSum = expenseReport.objects.values("value"
                     ).filter(
-                        date__year=d[3:], date__month=d[:2]
+                        date__year=d[3:], date__month=d[:2],user=request.user
                     ).filter(
                         category__name=str(filterCategory)).aggregate(
                     Sum('value'))['value__sum'] or 0
@@ -618,7 +627,7 @@ def expense_comparison_barchart(request):
         #       get the sum of the category and store in a list        
                 dataSum = expenseReport.objects.values("value"
                         ).filter(
-                            date__year=d[3:], date__month=d[:2]
+                            date__year=d[3:], date__month=d[:2],user=request.user
                         ).filter(
                             category__name=str(e)).aggregate(
                         Sum('value'))['value__sum']
@@ -632,7 +641,7 @@ def expense_comparison_barchart(request):
                     
             incomeBal = expenseReport.objects.values("value"
                     ).filter(
-                        date__year=d[3:], date__month=d[:2]
+                        date__year=d[3:], date__month=d[:2],user=request.user
                     ).filter(
                         category__name=str("Income")).aggregate(
                     Sum('value'))['value__sum'] or 0
@@ -683,7 +692,7 @@ def expense_comparison_barchart(request):
                 #get the sum of the category and store in a list        
                 dataSum = expenseReport.objects.values("value"
                         ).filter(
-                            date__year=d[3:], date__month=d[:2]
+                            date__year=d[3:], date__month=d[:2],user=request.user
                         ).filter(
                             category__name=str(c)).aggregate(
                         Sum('value'))['value__sum']
@@ -709,7 +718,7 @@ def expense_comparison_barchart(request):
             for c in newSet:
                 dataSum = expenseReport.objects.values("value"
                     ).filter(
-                        date__year=d[3:], date__month=d[:2]
+                        date__year=d[3:], date__month=d[:2],user=request.user
                     ).filter(
                         category__name=str(c)).aggregate(
                     Sum('value'))['value__sum']
