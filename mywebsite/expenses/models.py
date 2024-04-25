@@ -9,7 +9,7 @@ class ExpenseCategory(models.Model):
         return self.name
     
 class BudgetCategory(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budget')  # Link expense to a user
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budget_categories')  # Link expense to a user
     name = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=10,decimal_places=0,null=True, blank=True)
     #cashBack = models.DecimalField(max_digits=6,decimal_places=2,null=True,blank=True)
@@ -26,7 +26,7 @@ def get_or_create_default_category():
 class expenseReport(models.Model):    
     
     #see forms for more details
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expenses')  # Link expense to a user
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='expense_reports')  # Link expense to a user
     date = models.DateField(default=now)
     title = models.CharField(max_length=128)
     category = models.ForeignKey(BudgetCategory, on_delete=models.CASCADE,   related_name='expense_reports')

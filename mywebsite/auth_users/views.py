@@ -44,12 +44,19 @@ def user_logout(request):
 
 def initial_setup_view(request):
     if request.method == 'POST':
-        print("here in POST")
+        print("Received POST request")
+        print("POST data:", request.POST)
         form = BudgetCategoryForm(request.POST)
         if form.is_valid():
+            print("form valid!")
             form.save()
+            print("redirecting now!")
             return redirect('dashboard')  # Redirect to dashboard after adding a budget category
+        else:
+            print('errors')
+            print(form.errors)
+        
     else:
-        print("should be rendering the form")
         form = BudgetCategoryForm(user=request.user)
+    print("render form")
     return render(request, 'initial_setup.html', {'form': form})

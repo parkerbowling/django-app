@@ -86,7 +86,8 @@ WSGI_APPLICATION = 'mywebsite.wsgi.application'
 PASSWORD = os.environ.get('PASSWORD')
 USER = os.environ.get('USER')
 
-LOGIN_URL = '/'
+LOGIN_URL = 'login/'
+LOGIN_REDIRECT_URL = "/"
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Use database-backed sessions
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False

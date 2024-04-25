@@ -27,8 +27,9 @@ urlpatterns = [
     #name home path
     #path('home/', home, name="home"),
     
-    path('dashboard/', home, name="dashboard"),
-    path('',user_login,name='login'),
+    #path('dashboard/', home, name="dashboard"),
+    path('', home, name="home"),
+    path('login/',user_login,name='login'),
     path('initial-setup/',initial_setup_view,name='initial-setup'),
     
     # path('dashboard/', home, name="dashbaord"),

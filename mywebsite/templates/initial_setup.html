@@ -11,10 +11,61 @@
     You'll be naming each category and giving it a budget value. Don't worry, you can change these at any time!</h1>
     <!-- Add setup form or instructions here -->
 <h2>Add Budget Category</h2>
-<form method="post" action="{% url 'initial-setup' %}">  <!-- Use the correct URL pattern for form submission -->
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Add Category</button>
-</form>
+<div id="addCategorySection">
+    <form method="post" id="budgetForm" action="{% url 'expenses:save_budget_category' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="button" class="btn btn-primary" onclick="handleSubmission('budgetForm', 'budgetModal')">Save</button>
+    </form>
+</div>
+
+{% comment %} Ask ChatGPT on how to submit this form with JS {% endcomment %}
+
+{% comment %} <script>
+async function handleSubmission(formId, modalId) {
+    try {
+        const form = $(`#${formId}`);
+        const formData = new FormData(form[0]);
+
+        const response = await fetch(form.attr('action'), {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            // Success: reload the modal or update its content
+            //window.location.reload();
+            showSuccessMessageWithCountdownAndCloseModal("Added new category!", "budgetModal");
+
+            // Optionally, hide the modal if desired
+            //modal.modal('hide');
+        } else {
+            // Error: handle the error case
+            console.error('Form submission failed:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error handling form submission:', error);
+    }
+}
+function showSuccessMessageWithCountdownAndCloseModal(message, modalId) {
+    const successMessage = document.getElementById('success-message');
+    successMessage.textContent = message; // Set the success message
+    successMessage.style.display = 'block'; // Show the success message
+
+    let secondsLeft = 1; // Countdown duration in seconds
+    const countdownElement = document.createElement('span');
+
+    const countdownInterval = setInterval(() => {
+        secondsLeft--; // Decrement seconds
+
+        if (secondsLeft <= 0) {
+            clearInterval(countdownInterval); // Stop countdown
+            $(`#${modalId}`).modal('hide'); // Close the modal
+            window.location.reload(); // Reload the page
+        }
+    }, 1000); // Update countdown every second
+} {% endcomment %}
+
+</script>
 
 {% endblock body_content %}
