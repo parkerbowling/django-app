@@ -28,7 +28,7 @@ def user_login(request):
             user = authenticate(request, username=username, password=password)  # Authenticate user
             if user is not None:
                 login(request, user)  # Log in the user
-                return redirect('dashboard')  # Redirect to 'home' after successful login
+                return redirect('home')  # Redirect to 'home' after successful login
             else:
                 # Handle invalid credentials
                 return render(request, 'login.html', {'form': form, 'error_message': 'Invalid username or password'})
@@ -51,7 +51,7 @@ def initial_setup_view(request):
             print("form valid!")
             form.save()
             print("redirecting now!")
-            return redirect('dashboard')  # Redirect to dashboard after adding a budget category
+            return redirect('home')  # Redirect to dashboard after adding a budget category
         else:
             print('errors')
             print(form.errors)

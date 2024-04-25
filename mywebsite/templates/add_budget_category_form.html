@@ -1,5 +1,5 @@
 <h2>Add Budget Category</h2>
-<form method="post" action="{% url 'add_budget_category' %}">  <!-- Use the correct URL pattern for form submission -->
+<form method="POST" action="{% url 'add_budget_category' %}">  <!-- Use the correct URL pattern for form submission -->
   {% csrf_token %}
   {{ form.as_p }}
   <button type="submit">Add Category</button>

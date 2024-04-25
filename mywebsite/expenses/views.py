@@ -75,7 +75,7 @@ def budget_chart_data(request):
 @login_required
 def budget_modal_view(request):
     #categories = BudgetCategory.objects.all()
-    categories = list(BudgetCategory.objects.all())
+    categories = list(BudgetCategory.objects.filter(user=request.user))
     for i in categories:
         if i.name == "Income":
             categories.remove(i)
@@ -83,7 +83,7 @@ def budget_modal_view(request):
     return render(request, 'budget_modal.html', {'form': form, 'categories': categories})
 
 @login_required
-def save_budget_category_view(request, category_id):
+def save_budget_category_view_with_id(request, category_id):
     if request.method == 'POST':
         # Process POST request
         form = BudgetCategoryForm(request.POST)
@@ -117,7 +117,8 @@ def save_budget_category_view(request, category_id):
 @login_required
 def save_budget_category_view(request):
     if request.method == 'POST':
-        form = BudgetCategoryForm(request.POST)
+        form = BudgetCategoryForm(data=request.POST,user=request.user)
+        form.save()
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -125,7 +126,7 @@ def save_budget_category_view(request):
             return JsonResponse({'error': form.errors}, status=400)
     else:
         # For GET requests, return an empty form
-        form = BudgetCategoryForm()
+        form = BudgetCategoryForm(user=request.user)
         return render(request, 'budget_modal.html', {'form': form})
 
 @login_required
@@ -138,7 +139,7 @@ def edit_category_view(request, category_id=None):
 
     if request.method == 'POST':
         # Handle form submission
-        form = BudgetCategoryForm(request.POST, instance=category)
+        form = BudgetCategoryForm(data=request.POST, user=request.user,instance=category)
         if form.is_valid():
             form.save()
             return JsonResponse({'success': True})
@@ -146,7 +147,7 @@ def edit_category_view(request, category_id=None):
             return JsonResponse({'errors': form.errors}, status=400)
     else:
         # Render the form with existing instance data or empty form
-        form = BudgetCategoryForm(instance=category)
+        form = BudgetCategoryForm(user=request.user,instance=category)
         return render(request, 'edit_budget_category_form.html', {'form': form, 'category': category})
 
 @login_required
@@ -170,11 +171,11 @@ def expense_home(request):
     if request.method == "GET":
         
         #initalize empty form (figure out how to preload an inital value?)
-        formFilter = expenseComparison()
+        formFilter = expenseComparison(user=request.user)
 
     else:
         #get date on a POST
-        formFilter = expenseComparison(request.POST)
+        formFilter = expenseComparison(data=request.POST,user=request.user)
         
         if formFilter.is_valid():
             #get data from cleaned, valid form
@@ -242,10 +243,16 @@ def expense_home(request):
 def add_expense(request):
 
     #define a form to be used. Arguments POST it to the view if a POST is requested or post an empty form
-    form = expenseReportForm(request.POST or None)
+    
+    if request.method == "GET":
+        
+        #initalize empty form (figure out how to preload an inital value?)
+        form = expenseReportForm(user=request.user)
 
     #if the method is a POST, save form and return success and redirect to a new form
-    if request.method == "POST":
+    else:
+        form = expenseReportForm(data=request.POST,user=request.user)
+        
         if form.is_valid():
             form.save()
             messages.success(request, 'Expense added!')

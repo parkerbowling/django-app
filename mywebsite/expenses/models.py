@@ -16,6 +16,9 @@ class BudgetCategory(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def getUser(self):
+        return self.user
 
 def get_or_create_default_category():
     category, created = BudgetCategory.objects.get_or_create()

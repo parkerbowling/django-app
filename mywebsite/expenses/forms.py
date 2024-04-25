@@ -65,14 +65,19 @@ class expenseReportForm(forms.ModelForm):
         label="Note"
     )
     
-    def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)  # Retrieve user from keyword arguments
+    # def __init__(self, *args, **kwargs):
+    #     self.user = kwargs.pop('user', None)  # Retrieve user from keyword arguments
+    #     super(expenseReportForm, self).__init__(*args, **kwargs)
+        
+    def __init__(self, user, *args, **kwargs):
+        self.user = user  # Store the user for later use
         super(expenseReportForm, self).__init__(*args, **kwargs)
+        self.fields['category'].queryset = BudgetCategory.objects.filter(user=user)
 
     def save(self, commit=True):
         instance = super(expenseReportForm, self).save(commit=False)
         if self.user:
-            instance.user = self.user  # Associate form data with the user
+            instance.user = self.user  # Set the user for the expense report
         if commit:
             instance.save()
         return instance
@@ -123,6 +128,11 @@ class expenseComparison(forms.Form):
             if end_time < from_time:
                 raise forms.ValidationError("End date cannot be earlier than start date!")
         return cleaned_data
+    
+    def __init__(self, user, *args, **kwargs):
+        super(expenseComparison, self).__init__(*args, **kwargs)
+        # Filter BudgetCategory queryset based on the user
+        self.fields['expenseLabelCategory'].queryset = BudgetCategory.objects.filter(user=user)
 
 class BudgetCategoryForm(forms.ModelForm):
     class Meta:

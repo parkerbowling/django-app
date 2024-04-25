@@ -5,6 +5,7 @@
 {% url 'recipes:recipe_home' as recipe_home %}
 
 {% if user.is_authenticated %}
+    Welcome, {{ request.user.get_username }}
     <a href="{% url 'auth_users:logout' %}">Logout</a>
 {% else %}
 {% endif %}
