@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% comment %} {% extends 'base.html' %} {% endcomment %}
 
 {% block title %}
 
@@ -10,62 +10,51 @@
 <h1>Welcome to the Budget and Expense Tracker! Glad you're finally taking control of your finances. Let's add some budget categories for you to track. 
     You'll be naming each category and giving it a budget value. Don't worry, you can change these at any time!</h1>
     <!-- Add setup form or instructions here -->
-<h2>Add Budget Category</h2>
-<div id="addCategorySection">
-    <form method="post" id="budgetForm" action="{% url 'expenses:save_budget_category' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="button" class="btn btn-primary" onclick="handleSubmission('budgetForm', 'budgetModal')">Save</button>
+    <h2>Add Budget Category</h2>
+    <form method="POST" id='initialBudgetCategory' action="{% url 'expenses:save_budget_category' %}">  <!-- Use the correct URL pattern for form submission -->
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="button" class="btn btn-primary" onclick="handleSubmission('initialBudgetCategory'); initialInteraction();">Add Category</button>
     </form>
-</div>
+    
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
-{% comment %} Ask ChatGPT on how to submit this form with JS {% endcomment %}
-
-{% comment %} <script>
-async function handleSubmission(formId, modalId) {
-    try {
-        const form = $(`#${formId}`);
-        const formData = new FormData(form[0]);
-
-        const response = await fetch(form.attr('action'), {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (response.ok) {
-            // Success: reload the modal or update its content
-            //window.location.reload();
-            showSuccessMessageWithCountdownAndCloseModal("Added new category!", "budgetModal");
-
-            // Optionally, hide the modal if desired
-            //modal.modal('hide');
-        } else {
-            // Error: handle the error case
-            console.error('Form submission failed:', response.statusText);
-        }
-    } catch (error) {
-        console.error('Error handling form submission:', error);
+    <script>
+    async function handleSubmission(formId) {
+      try {
+          const form = $(`#${formId}`);
+          const formData = new FormData(form[0]);
+    
+          const response = await fetch(form.attr('action'), {
+              method: 'POST',
+              body: formData,
+          });
+    
+          if (response.ok) {
+              // Success: reload the modal or update its content
+              //window.location.reload();
+              window.location.href = '/';
+              // Optionally, hide the modal if desired
+              //modal.modal('hide');
+          } else {
+              // Error: handle the error case
+              console.error('Form submission failed:', response.statusText);
+          }
+      } catch (error) {
+          console.error('Error handling form submission:', error);
+      }
     }
-}
-function showSuccessMessageWithCountdownAndCloseModal(message, modalId) {
-    const successMessage = document.getElementById('success-message');
-    successMessage.textContent = message; // Set the success message
-    successMessage.style.display = 'block'; // Show the success message
+    // Assume this is triggered after completing initial interaction
+    function initialInteraction() {
+        // Set a session flag indicating initial interaction completion
+        console.log(`initialInteractionCompleted_${request.user.id}`);
+        sessionStorage.setItem(`initialInteractionCompleted_${request.user.id}`, 'true');
+        // Redirect to the desired page (e.g., dashboard)
+        //window.location.href = '/dashboard'; // Redirect to your dashboard or home page URL
+    }
 
-    let secondsLeft = 1; // Countdown duration in seconds
-    const countdownElement = document.createElement('span');
 
-    const countdownInterval = setInterval(() => {
-        secondsLeft--; // Decrement seconds
+    </script>
 
-        if (secondsLeft <= 0) {
-            clearInterval(countdownInterval); // Stop countdown
-            $(`#${modalId}`).modal('hide'); // Close the modal
-            window.location.reload(); // Reload the page
-        }
-    }, 1000); // Update countdown every second
-} {% endcomment %}
-
-</script>
 
 {% endblock body_content %}

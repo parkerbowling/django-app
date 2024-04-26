@@ -1,6 +1,35 @@
 <h2>Add Budget Category</h2>
-<form method="POST" action="{% url 'add_budget_category' %}">  <!-- Use the correct URL pattern for form submission -->
+<form method="POST" id='initialBudgetCategory' action="{% url 'expenses:save_budget_category' %}">  <!-- Use the correct URL pattern for form submission -->
   {% csrf_token %}
   {{ form.as_p }}
-  <button type="submit">Add Category</button>
+  <button type="button" class="btn btn-primary" onclick="handleSubmission('initialBudgetCategory')">Add Category</button>
 </form>
+
+<script>checkAccessToRestrictedPage();</script>
+
+<script>
+async function handleSubmission(formId) {
+  try {
+      const form = $(`#${formId}`);
+      const formData = new FormData(form[0]);
+
+      const response = await fetch(form.attr('action'), {
+          method: 'POST',
+          body: formData,
+      });
+
+      if (response.ok) {
+          // Success: reload the modal or update its content
+          //window.location.reload();
+
+          // Optionally, hide the modal if desired
+          //modal.modal('hide');
+      } else {
+          // Error: handle the error case
+          console.error('Form submission failed:', response.statusText);
+      }
+  } catch (error) {
+      console.error('Error handling form submission:', error);
+  }
+}
+</script>

@@ -41,7 +41,6 @@ def user_logout(request):
     logout(request)
     return redirect('login')  # Redirect to home page after logout
 
-
 def initial_setup_view(request):
     if request.method == 'POST':
         print("Received POST request")

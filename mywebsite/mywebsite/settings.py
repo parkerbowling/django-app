@@ -40,9 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'whitenoise.runserver_nostatic',
+    'expenses.apps.ExpensesConfig',
     
     #added my apps 
-    'expenses',
+    #'expenses',
     'recipes',
     'auth_users',
     #'chartGPT',

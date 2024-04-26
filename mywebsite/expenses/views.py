@@ -282,13 +282,12 @@ def pie_chart_category_data(request, category):
 @login_required
 def pie_chart_data(request):
         #dynamically get the Categories in case I decide to add or remove one of them and make them unique
-    newSet = list(BudgetCategory.objects.all())
+    newSet = list(BudgetCategory.objects.filter(user=request.user))
     for i in range(len(newSet)):
         newSet[i] = newSet[i].name
-    try:
-        newSet.remove("Income")
-    except ValueError:
-        print("no income reported")
+        
+    newSet.remove('Income')
+    print(newSet)
     #name a json structure for inserting data into chart
     allCategoryData = {
         "title": "",
@@ -348,14 +347,12 @@ def expense_piechart(request):
 def expense_sankeychart(request):
     
     #get category names, should these be helper functions?
-    newSet = list(BudgetCategory.objects.all())
+    newSet = list(BudgetCategory.objects.filter(user=request.user))
     for i in range(len(newSet)):
         newSet[i] = newSet[i].name
-    try:
-        newSet.remove("Income")
-    except ValueError:
-        print("no income reported")
-
+    
+    newSet.remove('Income')
+    print(newSet)
     data = []
     
     #get current dates
@@ -487,13 +484,11 @@ def comparison_chart_category_data(request,category,date):
 @login_required
 def expense_comparison_barchart(request):
 
-    newSet = list(BudgetCategory.objects.all())
+    newSet = list(BudgetCategory.objects.filter(user=request.user))
     for i in range(len(newSet)):
         newSet[i] = newSet[i].name
-    try:
-        newSet.remove("Income")
-    except ValueError:
-        print("no income reported")
+        
+    print(newSet)
     
     #gets the date input from the user
     fromDate = request.session.get("date") #on first start this has no value, need to chaange this to a try statement
