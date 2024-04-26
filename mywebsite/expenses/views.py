@@ -3,7 +3,7 @@ from django.db.models import Sum
 from .models import expenseReport, BudgetCategory
 from .forms import expenseReportForm, expenseComparison, BudgetCategoryForm, ExpenseCategory
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from datetime import datetime
 from pandas import period_range
 from numpy import average as avg
@@ -163,6 +163,25 @@ def delete_category_view(request, category_id):
         print("exception!")
         # If an exception occurs, return an error response with details
         return JsonResponse({'error': f'Delete failed: {str(e)}'}, status=500)
+    
+@login_required
+def deleteExpenseItem(request,date,name,value):
+    
+    print(date)
+    print(name)
+    print(value)
+    
+    try:
+        expenseItem = expenseReport.objects.get(date=date, title=name, value=value,user=request.user)
+
+        expenseItem.delete()
+        
+        # Optionally, you can return a response indicating success
+        return HttpResponse("Expense item deleted successfully.")
+    except expenseItem.DoesNotExist:
+        # Handle case when the ExpenseItem does not exist
+        return HttpResponse("Expense item does not exist.", status=404)
+    
 
 #################################
 @login_required

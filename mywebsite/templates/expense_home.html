@@ -58,6 +58,7 @@
           <div id="modal" class="modal">
             <div class="modal-content">
               <span class="close">&times;</span>
+              <div id="success-message" style="display: none;"></div> 
               <div id="modalContent"></div>
             </div>
           </div>
@@ -88,7 +89,7 @@
               }
             }
 
-            function displayCategoryDataInModal(category, data) {
+            async function displayCategoryDataInModal(category, data) {
                 const modalContent = document.getElementById('modalContent');
                 
                 // Clear any existing content in the modal content
@@ -105,14 +106,64 @@
                   const name = dataPoint.title;
                   const value = dataPoint.value;
               
+                  const dataPointContainer = document.createElement('div');
+
                   // Create a paragraph element to display the name and value
                   const dataPointElement = document.createElement('p');
                   dataPointElement.textContent = `${date} - ${name}: $${value}`;
-              
                   // Append the paragraph element to the modal content
-                  modalContent.appendChild(dataPointElement);
+                  
+
+                  //Create a delete button for each category
+                  const deleteExpenseItem = document.createElement('button');
+                  deleteExpenseItem.textContent = 'Delete';
+                  
+                  //append button to dataPoint
+                  dataPointElement.appendChild(deleteExpenseItem);
+
+                  //append the whole paragraph element to the div container
+                  dataPointContainer.appendChild(dataPointElement);
+
+                  //then append it to the modal
+                  modalContent.appendChild(dataPointContainer);
+
+                  deleteExpenseItem.addEventListener('click', () => deleteExpenseItemButton(date,name,value));
+ 
                 });
-              
+
+
+                async function deleteExpenseItemButton(date,name,value) {
+                  try {
+                    // Ask for confirmation before deleting
+                    const confirmDelete = window.confirm("Are you sure you want to delete this expense?\nThis action cannot be undone!");
+                    
+                    // If user confirms deletion
+                    if (confirmDelete) {
+                        // Perform an AJAX request to delete the category
+                        const response = await fetch(`/expenses/budget/delete/${date}/${name}/${value}/`, {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRFToken': getCookie('csrftoken')
+                            }
+                        });
+            
+                        if (response.ok) {
+                            // Handle success (e.g., refresh the page or update UI)
+                            console.log('Category deleted successfully');
+                            showSuccessMessageWithCountdownAndCloseModal("Expense deleted!", "modal");
+                            window.location.reload();
+                        } else {
+                            // Handle errors (e.g., display an error message)
+                            console.error('Error deleting category:', response.statusText);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error deleting category:', error);
+                }
+  
+                }
+
+            
                 // Display the modal
                 const modal = document.getElementById('modal');
                 modal.style.display = 'block';
@@ -129,8 +180,42 @@
                     modal.style.display = 'none';
                   }
                 };
+            }
+
+              function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        // Check if this cookie name matches the one we are looking for
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
               }
-        
+            
+              function showSuccessMessageWithCountdownAndCloseModal(message, modalId) {
+                const successMessage = document.getElementById('success-message');
+                successMessage.textContent = message; // Set the success message
+                successMessage.style.display = 'block'; // Show the success message
+            
+                let secondsLeft = 1; // Countdown duration in seconds
+                const countdownElement = document.createElement('span');
+            
+                const countdownInterval = setInterval(() => {
+                    secondsLeft--; // Decrement seconds
+            
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdownInterval); // Stop countdown
+                        $(`#${modalId}`).modal('hide'); // Close the modal
+                        window.location.reload(); // Reload the page
+                    }
+                }, 1000); // Update countdown every second
+              }
             // Render the pie chart with dynamic data fetched from the first fetch call
             async function renderChart() {
               const pieChartData = await fetchPieChartData();
