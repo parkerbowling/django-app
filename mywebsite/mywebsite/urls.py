@@ -24,18 +24,9 @@ urlpatterns = [
     #name admin path
     path('admin/', admin.site.urls),
     
-    #name home path
-    #path('home/', home, name="home"),
-    
-    #path('dashboard/', home, name="dashboard"),
     path('', home, name="home"),
     path('login/',user_login,name='login'),
     path('initial-setup/',initial_setup_view,name='initial-setup'),
-    
-    # path('dashboard/', home, name="dashbaord"),
-    # path('',login,name='login'),
-    
-
 
     #name expenses urls by including expenses namespace
     path('expenses/',include('expenses.urls',namespace='expenses')),
@@ -45,13 +36,8 @@ urlpatterns = [
     path('expense-comparison-barchart/',expense_comparison_barchart,name='expense-comparison-barchart'),
     path('comparison-chart-category-data/<str:category>/<str:date>/',comparison_chart_category_data,name='comparison-chart-category-data'),
     #name expenses urls by including recipes namespace
-    path('budget-chart-data/',budget_chart_data,name="budget-chart-data"),
+    path('budget-chart-data/<str:currentDate>/',budget_chart_data,name="budget-chart-data"),
     path('recipes/',include('recipes.urls',namespace='recipes')),
     path('auth_users/', include('auth_users.urls',namespace='auth_users')),
-    
-    #path('chartGPT/',include('chartGPT.urls',namespace='chartGPT')),
-    
-    #path("auth_users/",include('auth_users.urls')),
-    #path("auth_users/",include('django.contrib.auth.urls'))
     
 ]

@@ -177,6 +177,11 @@
                     console.error('Error loading modal content:', error);
                 }
             }
+
+            function updateCurrentDateString(newDateString) {
+                currentDateString = newDateString;
+            }
+
         </script>
 
     </div>
@@ -184,12 +189,124 @@
     <div id="budget-container">
     <script>
         async function fetchDataAndRenderChart() {
-            const response = await fetch('/budget-chart-data/');
+
+            const date = new Date();
+            let month = new String(date.getMonth() + 1);
+            let year = date.getFullYear();
+            let day = new String(date.getDate());
+        
+            if (month.length == 1) {
+                month = "0" + month
+            }
+        
+            if (day.length == 1) {
+                day = "0" + day
+            }
+        
+            const nowDate = year + "-" + month + "-" + day;
+        
+            const response = await fetch(`/budget-chart-data/${nowDate}`);
             const data = await response.json();
+            console.log(data.date);
+            let datePass = data.date;
+        
+            // Set the current date to the one received from the server response
+            const parts = datePass.split("-");
+            const currentYear = parseInt(parts[0]);
+            const currentMonth = parseInt(parts[1]);
+            const currentDay = parseInt(parts[2]);
+        
+            const currentDate = new Date(currentYear, currentMonth - 1, currentDay).toISOString().slice(0, 10);
+        
+            // Define the tooltipFormatter function outside the chart initialization
+            let tooltipFormatter = function () {
+                var diff = this.points[1].y - this.points[0].y;
+                var status = diff > 0 ? 'Over budget' : 'Under budget';
+                var absDiff = Math.abs(diff);
+        
+                return '<b>' + this.x + '</b><br/>' +
+                    this.points[0].series.name + ': ' + '$' + this.points[0].y + '<br/>' +
+                    this.points[1].series.name + ': ' + '$' + this.points[1].y + '<br/>' +
+                    status + ': $' + absDiff;
+            };
         
             Highcharts.chart('budget-container', {
                 chart: {
-                    type: 'bar'
+                    type: 'bar',
+                    events: {
+                        //chart buttons go here!
+                        render: function () {
+                            var chart = this,
+                                title = chart.title.element,
+                                titleBox = title.getBBox(),
+                                buttonSpacing = 10;
+        
+                            // Clear existing buttons
+                            chart.series.forEach(function (series) {
+                                if (series.customButton) {
+                                    series.customButton.destroy();
+                                }
+                            });
+        
+                            function createButtonClickHandler(currentDate, bool) {
+                                return function () {
+                                    let year = parseInt(currentDate.slice(0, 4));
+                                    let month = parseInt(currentDate.slice(5, 7));
+                                    let day = parseInt(currentDate.slice(8, 10));
+        
+                                    if (bool) { // Decrease to the previous month
+                                        month--;
+                                        if (month === 0) {
+                                            month = 12;
+                                            year--;
+                                        }
+                                        else if (month < 0) {
+                                            month += 12; // Wrap around to December if month becomes negative
+                                            year--;
+                                        }
+                                    } else { // Increase to the next month
+                                        month++;
+                                        if (month === 13) {
+                                            month = 1;
+                                            year++;
+                                        }
+                                    }
+        
+                                    // Adjust leading zero for single-digit months or days
+                                    const formattedMonth = month < 10 ? "0" + month : month;
+                                    const formattedDay = day < 10 ? "0" + day : day;
+        
+                                    const newDate = `${year}-${formattedMonth}-${formattedDay}`;
+        
+                                    // Fetch new data for the specified month
+                                    fetch(`/budget-chart-data/${newDate}`)
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            chart.update({
+                                                title: {
+                                                    text: data.title // Update chart title
+                                                },
+                                                series: [{
+                                                    data: data.series[0].data // Updated data for the specified month
+                                                }, {
+                                                    data: data.series[1].data // Keep actual data unchanged
+                                                }]
+                                            });
+        
+                                            // Update currentDate with the new date
+                                            datePass = newDate;
+                                        });
+                                };
+                            }
+        
+        
+                            // Add button for minus month attached to the left of the title
+                            chart.series[0].customButton = chart.renderer.button('<-', titleBox.x - 70 - buttonSpacing, titleBox.y, createButtonClickHandler(datePass, true)).add();
+        
+                            // Add button for plus attached to the right of the title
+                            chart.series[1].customButton = chart.renderer.button('->', titleBox.x + titleBox.width + 70 + buttonSpacing, titleBox.y, createButtonClickHandler(datePass, false)).add();
+                        }
+                    }
                 },
                 title: {
                     text: data.title
@@ -201,7 +318,7 @@
                     title: {
                         text: 'Dollars'
                     }
-                    
+        
                 },
                 plotOptions: {
                     series: {
@@ -210,18 +327,7 @@
                 },
                 tooltip: {
                     shared: true,
-                    formatter: function () {
-                        var diff = this.points[1].y - this.points[0].y;
-                        if (diff > 0) {
-                            var over = 'Over budget by:'
-                        } else {
-                            var over = 'Under budget by:'
-                        }
-                        return '<b>' + this.x + '</b><br/>' +
-                            this.points[0].series.name + ': ' + '$' + this.points[0].y + '<br/>' +
-                            this.points[1].series.name + ': ' + '$' + this.points[1].y + '<br/>' +
-                            over + ' $' + diff;
-                    }
+                    formatter: tooltipFormatter
                 },
                 series: data.series
             });

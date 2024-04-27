@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.timezone import now
+from datetime import date
 from django.contrib.auth.models import User 
 
 class ExpenseCategory(models.Model):
@@ -8,8 +9,12 @@ class ExpenseCategory(models.Model):
     def __str__(self):
         return self.name
     
+def default_date():
+    return date.today()
+    
 class BudgetCategory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='budget_categories')  # Link expense to a user
+    date = models.DateField(default=default_date)
     name = models.CharField(max_length=255)
     value = models.DecimalField(max_digits=10,decimal_places=0,null=True, blank=True)
     #cashBack = models.DecimalField(max_digits=6,decimal_places=2,null=True,blank=True)

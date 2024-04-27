@@ -16,14 +16,19 @@ def home(request):
     return render(request, 'home.html')
 
 @login_required
-def budget_chart_data(request):
+def budget_chart_data(request,currentDate):
+    print(currentDate)
+    #it can't get the budget value before it was created!!! need to understand what to do when going back before budget category existed!
+    # I could put a "try" in, tries to fetch, if error, just return current months' data or if it tries to go above current month, just return current months data
+    
     budget_categories = list(BudgetCategory.objects.filter(user=request.user))
     for i in budget_categories:
         if i.name == "Income":
             budget_categories.remove(i)
-    date_now = datetime.now()
-    current_year = date_now.year
-    current_month = date_now.month
+
+    current_year = currentDate[:4]
+    current_month = currentDate[5:7]
+    current_day = currentDate[8:]
     title = f'Monthly Budget for {current_month}/{current_year}'
 
     data_of_expenses = []
@@ -63,6 +68,7 @@ def budget_chart_data(request):
         'categories': [category.name for category in budget_categories],
         'budget_values': budget_values_json,
         'title': title,
+        'date':currentDate,
         'series': [
             {'name': 'Alloted Budget Amount', 'data': budget_values_json, 'color': '#A1E097'},
             {'name': 'Expense Amount', 'data': data_of_expenses, 'color': '#F56C6C'}
