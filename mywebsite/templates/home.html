@@ -178,8 +178,8 @@
                 }
             }
 
-            function updateCurrentDateString(newDateString) {
-                currentDateString = newDateString;
+            function updateDatePass(newDate) {
+                datePass = newDate;
             }
 
         </script>
@@ -204,10 +204,12 @@
             }
         
             const nowDate = year + "-" + month + "-" + day;
-        
+
+            console.log("fetch1",nowDate);
             const response = await fetch(`/budget-chart-data/${nowDate}`);
             const data = await response.json();
-            console.log(data.date);
+            console.log("data.date",data.date);
+            console.log("nowDate",nowDate);
             let datePass = data.date;
         
             // Set the current date to the one received from the server response
@@ -253,6 +255,7 @@
                                     let year = parseInt(currentDate.slice(0, 4));
                                     let month = parseInt(currentDate.slice(5, 7));
                                     let day = parseInt(currentDate.slice(8, 10));
+                                    console.log("currentDate inside createButtonClickHandler",currentDate)
         
                                     if (bool) { // Decrease to the previous month
                                         month--;
@@ -279,6 +282,7 @@
                                     const newDate = `${year}-${formattedMonth}-${formattedDay}`;
         
                                     // Fetch new data for the specified month
+                                    console.log("fetch2",newDate);
                                     fetch(`/budget-chart-data/${newDate}`)
                                         .then(response => response.json())
                                         .then(data => {
@@ -299,10 +303,9 @@
                                 };
                             }
         
-        
                             // Add button for minus month attached to the left of the title
                             chart.series[0].customButton = chart.renderer.button('<-', titleBox.x - 70 - buttonSpacing, titleBox.y, createButtonClickHandler(datePass, true)).add();
-        
+
                             // Add button for plus attached to the right of the title
                             chart.series[1].customButton = chart.renderer.button('->', titleBox.x + titleBox.width + 70 + buttonSpacing, titleBox.y, createButtonClickHandler(datePass, false)).add();
                         }

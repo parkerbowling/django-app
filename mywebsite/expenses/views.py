@@ -514,6 +514,7 @@ def expense_comparison_barchart(request):
         newSet[i] = newSet[i].name
         
     print(newSet)
+    newSet.remove('Income')
     
     #gets the date input from the user
     fromDate = request.session.get("date") #on first start this has no value, need to chaange this to a try statement
